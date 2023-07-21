@@ -159,6 +159,25 @@ const hotelDataAdmin=async(req,res)=>{
         
     }
 }
+// ....................................get hotelStatus change  by admin......................................
+
+const hotelStatusChange=async(req,res)=>{
+    try {
+        const id = req.query.id;
+        const hotelStatus=await Hotel.findOne({_id:id})
+        hotelStatus.status=!hotelStatus.status
+        const hotels = await hotelStatus.save();
+
+       if(hotels){
+           return res.status(201).json({hotels})
+        }else{
+            return res.status(500).json({message:"unable to get Hotel details"}) 
+        }
+    } catch (error) {
+        console.log(error.message);
+        
+    }
+}
 // ....................................get hoteldata  to user......................................
 
 const hotelDataUser=async(req,res)=>{
@@ -179,7 +198,6 @@ const hotelDataUser=async(req,res)=>{
 const singleHotelData=async(req,res)=>{
     try {
         const id =req.params.id
-        console.log(id,'....idd');
        const hotels=await Hotel.find({_id:id,proofstatus:true,status:false})
        if(hotels){
     //    const categoryData=await category.find({})
@@ -216,6 +234,7 @@ module.exports={
     hotelDataAdmin,
     updateproofstatus,
     hotelDataUser,
-    singleHotelData
+    singleHotelData,
+    hotelStatusChange
 
 }

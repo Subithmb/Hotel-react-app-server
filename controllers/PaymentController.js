@@ -26,13 +26,13 @@ require("dotenv").config()
            throw new Error("user not found")
           }
           
-        const{name,phone,total,totalDays,checkIn,checkOut,hotelID,guest}=req.body
+        const{name,phone,total,totalDays,checkIn,checkOut,hotelID,guest,newTotal,tax,fee}=req.body
 
 
         let instance = new Razorpay({ key_id:process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_KEY_SECRET })
       
         const options = {
-            amount: total*100,  // amount in the smallest currency unit
+            amount: newTotal*100,  // amount in the smallest currency unit
             currency: "INR",
             receipt: crypto.randomBytes(10).toString("hex"),
           };
@@ -45,7 +45,10 @@ require("dotenv").config()
             
             const newBooking=new Booking({
               name,bookingId:order.id
-              , phone, total, totalDays,checkIn,checkOut,userID,hotelID,guest
+              , phone, total, totalDays,checkIn,checkOut,userID,hotelID,guest,
+              serviceFee:fee,
+              tax,
+              UpdatedTotal:newTotal
             })
             const bookedData=newBooking.save()
             res.status(200).json({data:order,bookedData})

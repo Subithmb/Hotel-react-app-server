@@ -24,6 +24,18 @@ const BookingSchema = new mongoose.Schema({
     discount: {
       type: "number",
     },
+    UpdatedTotal: {
+      type: "number",
+      required: true
+    },
+    tax: {
+      type: "number",
+      required: true
+    },
+    serviceFee: {
+      type: "number",
+      required: true
+    },
     totalDays: {
       type: "number",
       required: true

@@ -15,5 +15,8 @@ adminRouter.post('/addcategory',HotelController.Addcategory)
 adminRouter.get('/getcategory',HotelController.getCategory)
 adminRouter.get('/gethotelRequestData',HotelController.hotelDatarequestAdmin)
 adminRouter.get('/gethotelData',HotelController.hotelDataAdmin)
+adminRouter.get('/getUserData',adminController.UserManage)
+adminRouter.put('/getUserStatus',adminController.UserStatusChange)
+adminRouter.put('/getHotelStatus',HotelController.hotelStatusChange)
 adminRouter.post('/updateHotelproofstatus',HotelController.updateproofstatus)
 module.exports=adminRouter
