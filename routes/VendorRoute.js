@@ -4,27 +4,7 @@ const admin=require('../models/Admin')
 const vendor=require('../models/Vendor')
 const VendorController=require('../controllers/VendorController')
 const HotelController=require('../controllers/HotelController')
-const multer = require("multer")
-const path = require('path')
-
-const storage = multer.diskStorage({
-    destination:function(req,file,cb){
-        cb(null,path.join(__dirname,"../public/Images"),function(error,success){
-            if(error){
-                console.log(error);
-            }
-        })
-    },
-    filename:function(req,file,cb){
-        const name = Date.now()+"-"+file.originalname;
-        cb(null,name,function(error,success){
-            if(error){
-                console.log(error);
-            }
-        })
-    }
-})
-const upload = multer({storage:storage})
+const upload=require('../middleWare/Multer')
 
 vendorRouter.post('/vendorsignup',VendorController.addVendor)
 vendorRouter.post('/vendorlogin',VendorController.VendorLogin)
