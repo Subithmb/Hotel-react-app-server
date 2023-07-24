@@ -73,21 +73,9 @@ const VendorLogin=async(req,res)=>{
 
 const getProfile=async(req,res,next)=>{
   try {
-    
-    if (!req.cookies || !req.cookies.jwt.VendorToken) {
-      
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-
-    
-    const jwtToken = req.cookies.jwt.VendorToken;
-    const decodetoken = jwt.verify(jwtToken, "secretCodeforVendor");
-
-    // console.log('jwt',decodetoken);
-
-      const vendorId = decodetoken.id;
+   
       try{
-      const vendor = await Vendor.findOne({ _id: vendorId });
+      const vendor = await Vendor.findOne({ _id: req.id });
       
        
       if (!vendor) {
@@ -116,7 +104,7 @@ const editVendorProfile= async(req,res)=>{
       }
       const{name,phone,email,brand}=req.body.VendorDatas
       console.log(name);
-      await Vendor.findByIdAndUpdate({_id:id},{$set:{name:name,phone:phone,email:email,brand:brand}})
+      await Vendor.findByIdAndUpdate({_id:decode.id},{$set:{name:name,phone:phone,email:email,brand:brand}})
 
       const vendorData = await Vendor.findById({_id:id})
       console.log(vendorData,'decodeveendor');
@@ -137,7 +125,7 @@ const editVendorProfile= async(req,res)=>{
 
 const editProfile= async(req,res)=>{
   try {
-      // console.log(req.cookies.jwt.VendorToken);
+      console.log(req.cookies.jwt.VendorToken);
      const jwtToken = req.cookies.jwt.VendorToken;
      const decode=jwt.verify(jwtToken,"secretCodeforVendor")
 

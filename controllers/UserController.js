@@ -7,7 +7,7 @@ const Booking=require('../models/Booking');
 
 const addUser=async(req,res)=>{
     try {
-       
+     
         const{name,email,password,phone}=req.body
       const  UserData=new User({
         name,email,password,phone
@@ -17,7 +17,7 @@ const addUser=async(req,res)=>{
         if(!UserData){
            return res.status(500).json({message:"unable to add user"}) 
         }
-       return res.status(201).json({UserData})
+       return res.status(200).json({UserData,message:'success'})
     } catch (error) {
         console.log(error.message);
         

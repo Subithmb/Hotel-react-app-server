@@ -12,9 +12,14 @@ const hotelSchema = new mongoose.Schema({
       ref:'category',
       required: true,
     },
-    review: {
-        type: "Array",   
-    },
+    review: [{
+      rating:{type:'number'},
+      feedback:{type:'string'},
+      userId:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref:'User'
+      }
+    }],
     Description: {
         type: "String",
         required: true
