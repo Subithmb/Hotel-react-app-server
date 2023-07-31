@@ -2,7 +2,8 @@ const Admin = require("../models/Admin");
 const vendor = require("../models/Vendor");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
-
+const Booking=require('../models/Booking');
+const Hotel=require('../models/Hotel')
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< add admin account >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 const addAdmin = async (req, res) => {
@@ -276,6 +277,60 @@ const getCategory = async (req, res) => {
 //     console.log(error.message);
 //   }
 // };
+// ......................getSingleBookingData...............................
+const BookingsDetails=async(req,res)=>{
+  try {
+   
+    const jwtToken = req.cookies.jwt.AdminToken;
+   
+    const decode=jwt.verify(jwtToken,"Secretcode")
+   
+     if(!decode.id){
+         throw new Error("Invalid Token")
+     }
+    
+     const bookingData=await Booking.find().populate('hotelID').populate('userID')
+    
+     if(!bookingData){
+      throw new Error("no booking found")
+  }
+  res.status(200).send({bookingData,message:"success"})
+
+  } catch (error) {
+    res.status(500).json({error:'Internal server error'});
+  }
+
+}
+
+// .......................vendor status change............................
+const VendorStatusChange = async (req, res) => {
+  try {
+    console.log('vendor', req.query.id);
+    const id = req.query.id;
+    const vendorStatus = await vendor.findOne({ _id: id });
+
+    vendorStatus.status= !vendorStatus.status
+    const vendorData = await vendorStatus.save();
+    // const hotelDate = await Hotel.find({vendor:id})
+    // for(data of hotelDate){
+    //   await Hotel.updateOne({adminStatus:!data.adminStatus})
+    // }
+
+    const hotelDate = await Hotel.find({ vendor: id });
+for (data of hotelDate) {
+  await Hotel.updateOne({ _id: data._id }, { adminStatus:!data.adminStatus });
+}
+
+
+    if (vendorData) {
+      return res.status(200).json({ vendorData ,message:'status updated'});
+    } else {
+      return res.status(404).json({ message: "No vendor Found" });
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
 
 module.exports = {
   addAdmin,
@@ -286,4 +341,6 @@ module.exports = {
   vendorManage,
   UserManage,
   UserStatusChange,
+  BookingsDetails,
+  VendorStatusChange
 };

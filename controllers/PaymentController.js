@@ -2,11 +2,15 @@ const Vendor=require('../models/Vendor')
 const User=require('../models/User');
 const Booking=require('../models/Booking');
 const jwt = require("jsonwebtoken");
-
+const nodemailer = require('nodemailer')
 const Razorpay = require("razorpay");
 const crypto = require('crypto');
 const { log } = require('console');
 require("dotenv").config()
+const fs = require('fs');
+const path=require('path')
+const { format } = require('date-fns');
+
 
 
     const orderCreate = async (req, res) => {
@@ -61,6 +65,20 @@ require("dotenv").config()
 
 const verify=async (req,res)=>{
   try {
+    
+    if (!req.cookies || !req.cookies.jwt.UserToken) {
+      
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    
+    const jwtToken = req.cookies.jwt.UserToken;
+    const decodetoken = jwt.verify(jwtToken, "secretCodeforUser");
+
+    // console.log('jwt',decodetoken);
+
+      const userId = decodetoken.id;
+
    
     const { razorpay_order_id,razorpay_payment_id,razorpay_signature} = req.body;
     
@@ -70,8 +88,8 @@ const verify=async (req,res)=>{
       .update(sign.toString())
       .digest("hex");
       if(razorpay_signature === expectedSign){
-        const bookingData=await Booking.findOne({bookingId:razorpay_order_id })
-       
+        const bookingData=await Booking.findOne({bookingId:razorpay_order_id }).populate('hotelID').populate('userID')
+       console.log('dataaaaaa',bookingData);
         if(!bookingData){
           return res.status(404).json({ message: "Booking not found"})
         }
@@ -80,7 +98,72 @@ const verify=async (req,res)=>{
 
         const bookedData = await bookingData.save();
 
-        return res.status(200).json({ message: "Payment verified", bookedData });
+
+
+
+// .......................... mail sending sarted..................................
+
+
+const nodemailer = require('nodemailer');
+
+// Create a Nodemailer transporter with your email service provider's SMTP configuration
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.user,
+    pass: process.env.pass
+  }
+});
+
+// Compose the email content
+// const imagePath = path.join(`${bookingData.hotelID.Images[0]}`);
+// const imageBase64 = fs.readFileSync(imagePath, { encoding: 'base64' });
+// Compose the email content
+// const hotelPhotoURL =  // Replace with the URL of the hotel photo  
+//   <img src="${hotelPhotoURL}" alt="Hotel Photo" style="max-width: 100%; height: auto;">
+// console.log(imageBase64  ,'imageeeeeeeeeeeee');
+
+const hotelPhotoURL = bookingData.hotelID.Images[0]
+const hotelName = bookingData.hotelID.Name;
+const bookingDate = bookingData.createdAt; 
+const checkinDate = bookingData.checkIn; 
+const checkoutDate = bookingData.checkOut;
+const name = bookingData.name;
+const checkinDateFormatted = format(new Date(checkinDate), 'MMMM dd, yyyy'); 
+const checkoutDateFormatted = format(new Date(checkoutDate), 'MMMM dd, yyyy');
+const bookingDateFormatted = format(new Date(bookingDate), 'MMMM dd, yyyy'); 
+const emailContent = `
+  <p style="font-size: 24px; font-weight: bold;">Booking Confirmation</p>
+  <p>Thank you <strong> ${name}</strong> for new Booking</p>
+  <img src=${bookingData.hotelID.Images[0]} alt="Hotel Photo" style="max-width: 100%; height: auto;">
+ 
+  <p><strong>Hotel Name:</strong><h3> ${hotelName}</h3></p>
+  <p><strong>Booking Date:</strong> ${bookingDateFormatted}</p>
+  <p><strong>Check-in Date:</strong> ${checkinDateFormatted}</p>
+  <p><strong>Check-out Date:</strong> ${checkoutDateFormatted}</p>
+`;
+
+const mailOptions = {
+  from: 'ikeaecom2023@gmail.com',
+  to: bookingData.userID. email,
+  subject: 'Booking Confirmation',
+  html: emailContent,
+};
+
+// Send the email
+transporter.sendMail(mailOptions, (error, info) => {
+  if (error) {
+    console.error('Error sending email:', error);
+  } else {
+    console.log('Email sent successfully:');
+    return res.status(200).json({ message: "Payment verified and mail sent", bookedData });
+  }
+});
+// .......................... mail sending ended..................................
+
+
+
+
 
       }else{
 

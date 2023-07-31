@@ -5,6 +5,7 @@ const vendor=require('../models/Vendor')
 const VendorController=require('../controllers/VendorController')
 const HotelController=require('../controllers/HotelController')
 const upload=require('../middleWare/Multer')
+// const multerMiddleware = require('../middleWare/Multer')
 const Vendor=require('../middleWare/Auth')
 
 vendorRouter.post('/vendorsignup',VendorController.addVendor)
@@ -19,5 +20,6 @@ vendorRouter.post('/vendorprofile',upload.single('image'),VendorController.editP
 vendorRouter.post('/vendorproof',upload.single('proof'),VendorController.ProofData)
 vendorRouter.post('/addHotel', upload.fields([{ name: 'license', maxCount: 1 },{ name:'images', maxCount: 10 }]),HotelController.AddHotel)
 vendorRouter.get('/hotelDatas',HotelController.hotelData)
+vendorRouter.get('/bookingDatas',VendorController.BookingData)
 
 module.exports=vendorRouter

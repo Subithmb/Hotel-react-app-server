@@ -18,5 +18,8 @@ adminRouter.get('/gethotelData',HotelController.hotelDataAdmin)
 adminRouter.get('/getUserData',adminController.UserManage)
 adminRouter.put('/getUserStatus',adminController.UserStatusChange)
 adminRouter.put('/getHotelStatus',HotelController.hotelStatusChange)
+adminRouter.put('/getVendorStatus',adminController.VendorStatusChange)
 adminRouter.post('/updateHotelproofstatus',HotelController.updateproofstatus)
+
+adminRouter.get('/bookings',adminController.BookingsDetails)
 module.exports=adminRouter

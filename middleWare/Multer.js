@@ -19,3 +19,22 @@ const storage = multer.diskStorage({
     }
 })
 module.exports = multer({storage:storage})
+
+
+
+// // multerMiddleware.js
+// const multer = require('multer');
+// // const cloudinaryStorage = require('multer-storage-cloudinary');
+
+// const cloudinaryStorage = require('multer-storage-cloudinary');
+// const cloudinary = require('./cloudinary');
+
+// const storage = cloudinaryStorage({
+//   cloudinary: cloudinary,
+//   folder: 'your_cloudinary_folder_name', // Optional: Set a specific folder in your Cloudinary account
+//   allowedFormats: ['jpg', 'jpeg', 'png', 'gif'] // Optional: Specify the allowed file formats
+// });
+
+// const multerMiddleware = multer({ storage: storage });
+
+// module.exports = multerMiddleware;

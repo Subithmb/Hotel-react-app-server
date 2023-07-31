@@ -18,6 +18,10 @@ const hotelSchema = new mongoose.Schema({
       userId:{
         type: mongoose.Schema.Types.ObjectId,
         ref:'User'
+      },
+      createdAt:{type:Date,
+        default:Date.now()
+
       }
     }],
     Description: {
@@ -99,6 +103,10 @@ const hotelSchema = new mongoose.Schema({
       type: "boolean",
       default:false
     },
+    adminStatus: {
+      type: "boolean",
+      default:false
+    },
     proofstatus: {
       type: "boolean",
       default:false
@@ -111,7 +119,8 @@ const hotelSchema = new mongoose.Schema({
 
    }          
     
-  });
+  },{timestamps:true}
+  );
   //{Name,Description,phone,Town,Pin,noofrooms,Rate,gust,district}
 
 

@@ -3,7 +3,7 @@ const vendor=require('../models/Vendor')
 const Hotel=require('../models/Hotel');
 const category=require('../models/category');
 const jwt = require("jsonwebtoken");
-
+const cloudinary = require('../middleWare/cloudinary')
 // .............................category............................
 const Addcategory=async(req,res)=>{
     try {
@@ -60,7 +60,7 @@ const getCategory=async(req,res)=>{
 
 const AddHotel=async(req,res)=>{
     try {
-        
+       
         if (!req.cookies || !req.cookies.jwt.VendorToken) {
       
             return res.status(401).json({ error: "Unauthorized" });
@@ -74,15 +74,32 @@ const AddHotel=async(req,res)=>{
             const Vendor = await vendor.findOne({ _id: vendorId,proofstatus:true});
                  
             if (Vendor) {
-                const licenseFile = req.files.license[0].filename;
-                 const imageFilenames = req.files?.images?.map((file) => file?.filename);
-                 
-            const{Name,categoryname,Description,phone,Town,Pin,noofrooms,Rate,AC,FOOD,TV,PETS,PARTYHALL,FISHING,GAMES,WIFI,gust,district}=req.body
-           
+                const Images=[]
+              
+                // const licenseFile =  req.files.license[0].path;
+                // Upload the license file to Cloudinary
+                // const licenseResult = await cloudinary.uploader.upload(licenseFile.path);
+                const licenseResult = await cloudinary.uploader.upload(req.files.license[0].path) 
+                if(!licenseResult){
+                    return res.status(500).json({message:"unable to add Hotel proof is not added"}) 
+                }
+                //  const imageFilenames = req.files?.images?.map((file) => file?.filename);
+                const imageFilenames = req.files?.images
+                if(!imageFilenames){
+                    return res.status(500).json({message:"unable to add Hotel image is not added"}) 
+                }
+                for (const image of imageFilenames) {
+                    const result = await cloudinary.uploader.upload(image.path);
+                    if (result && result.secure_url) {
+                        
+                        Images.push(result.secure_url);
+                    } }
+                  
+                    const{Name,categoryname,Description,phone,Town,Pin,noofrooms,Rate,AC,FOOD,TV,PETS,PARTYHALL,FISHING,GAMES,WIFI,gust,district}=req.body
             const  HotelData=new Hotel({
-                Name,categoryname,Description,phone,Town,Pin,noofrooms,Rate,Images:imageFilenames,gust,district,
+                Name,categoryname,Description,phone,Town,Pin,noofrooms,Rate,Images,gust,district,
                 Facilities: [{AC,FOOD,TV,PETS,PARTYHALL,FISHING,GAMES,WIFI }],
-                vendor:vendorId,proof:licenseFile
+                vendor:vendorId,proof:licenseResult.secure_url
                 })
                 const NewHotelData= await HotelData.save() 
                 if(!NewHotelData){
@@ -182,7 +199,19 @@ const hotelStatusChange=async(req,res)=>{
 
 const hotelDataUser=async(req,res)=>{
     try {
-       const hotels=await Hotel.find({proofstatus:true,status:false})
+        if (!req.cookies || !req.cookies.jwt.UserToken) {
+      
+            return res.status(401).json({ error: "Unauthorized" });
+          }
+      
+          
+          const jwtToken = req.cookies.jwt.UserToken;
+          const decodetoken = jwt.verify(jwtToken, "secretCodeforUser");
+      
+          // console.log('jwt',decodetoken);
+      
+            const userId = decodetoken.id;
+       const hotels=await Hotel.find({proofstatus:true,status:false,adminStatus:false}).populate('review')
        if(hotels){
        const categoryData=await category.find({})
            return res.status(201).json({hotels,categoryData})
@@ -197,8 +226,20 @@ const hotelDataUser=async(req,res)=>{
 
 const singleHotelData=async(req,res)=>{
     try {
+        if (!req.cookies || !req.cookies.jwt.UserToken) {
+      
+            return res.status(401).json({ error: "Unauthorized" });
+          }
+      
+          
+          const jwtToken = req.cookies.jwt.UserToken;
+          const decodetoken = jwt.verify(jwtToken, "secretCodeforUser");
+      
+          // console.log('jwt',decodetoken);
+      
+            const userId = decodetoken.id;
         const id =req.params.id
-       const hotels=await Hotel.find({_id:id,proofstatus:true,status:false})
+       const hotels=await Hotel.find({_id:id,proofstatus:true,status:false}).populate('review.userId')
        if(hotels){
     //    const categoryData=await category.find({})
            return res.status(201).json({hotels})
@@ -224,6 +265,12 @@ const updateproofstatus=async(req,res)=>{
         console.log(error.message);    
     }
 }
+
+
+// ...........................get booking for vendor..............................
+
+
+
 
 module.exports={
     AddHotel,

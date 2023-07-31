@@ -1,6 +1,10 @@
 const Vendor=require('../models/Vendor')
 // const User=require('../model/User');
 const jwt = require("jsonwebtoken");
+const cloudinary = require('../middleWare/cloudinary')
+
+const Booking=require('../models/Booking');
+const Hotel=require('../models/Hotel')
 
 const addVendor=async(req,res)=>{
     try {
@@ -73,6 +77,18 @@ const VendorLogin=async(req,res)=>{
 
 const getProfile=async(req,res,next)=>{
   try {
+
+    const jwtToken = req.cookies.jwt.VendorToken;
+    const decode=jwt.verify(jwtToken,"secretCodeforVendor")
+
+     if(!decode.id){
+         throw new Error("Invalid Token")
+     }else{
+     const vendorData = await Vendor.findOne({_id:decode.id})
+   
+     if(!vendorData){
+         throw new Error("vendor not found")
+     }
    
       try{
       const vendor = await Vendor.findOne({ _id: req.id });
@@ -84,7 +100,7 @@ const getProfile=async(req,res,next)=>{
         return res.status(200).json({ vendor });
       } catch (error) {
         return res.status(500).json({ error: "Database error" });
-      }
+      }}
    
   } catch (error) {
     return res.status(403).json({ error: "Token verification failed" });
@@ -125,7 +141,7 @@ const editVendorProfile= async(req,res)=>{
 
 const editProfile= async(req,res)=>{
   try {
-      console.log(req.cookies.jwt.VendorToken);
+     
      const jwtToken = req.cookies.jwt.VendorToken;
      const decode=jwt.verify(jwtToken,"secretCodeforVendor")
 
@@ -133,15 +149,17 @@ const editProfile= async(req,res)=>{
           throw new Error("Invalid Token")
       }
       const vendorData = await Vendor.findOne({_id:decode.id})
-    
+    console.log(vendorData);
 
       if(!vendorData){
           throw new Error("vendor not found")
       }
+      console.log(req.file,'hfhfh');
       if(req.file&&req.file.path){
+        const result = await cloudinary.uploader.upload(req.file.path)
         // console.log('ready ayiiiiiiii',req.file.path);
-        vendorData.image=req.file.filename;
-          const url =req.file.filename;
+        vendorData.image=result.secure_url;
+          const url =result.secure_url;
           await vendorData.save()
       
           res.status(200).send({success:true,url,message:"success"})
@@ -153,6 +171,7 @@ const editProfile= async(req,res)=>{
       res.status(500).json({error:'Internal server error'});
   }
 }
+
 
 const ProofData= async(req,res)=>{
   try {
@@ -172,8 +191,9 @@ const ProofData= async(req,res)=>{
       }
       
       if(req.file&&req.file.path){
-        vendorData.proof=req.file.filename;
-          const url =req.file.filename;
+        const result = await cloudinary.uploader.upload(req.file.path)
+        vendorData.proof=result.secure_url
+          const url =result.secure_url;
           await vendorData.save()
           console.log(url,"success")
           res.status(200).send({success:true,url,message:"proof added"})
@@ -259,6 +279,39 @@ const ProofData= async(req,res)=>{
 //   }
 // }
 
+// .................................booking data.............................
+
+const BookingData=async(req,res)=>{
+  try {
+    
+    const jwtToken = req.cookies.jwt.VendorToken;
+    const decode=jwt.verify(jwtToken,"secretCodeforVendor")
+    
+     if(!decode.id){
+           throw new Error("Invalid Token")
+       }
+
+       const partnerId=decode.id
+      
+      const Data = await Booking.find({ paymentStatus: true }).populate('userID').populate('hotelID')
+
+      const bookingData=await Data.filter((value)=>{
+   
+   return value.hotelID.vendor.toHexString()===partnerId
+ 
+ })
+ 
+     if(!bookingData){
+      throw new Error("no booking found")
+  }
+  res.status(200).send({bookingData,message:"success"})
+
+  } catch (error) {
+    res.status(500).json({error:'Internal server error'});
+  }
+
+}
+
 
     module.exports={
         addVendor,
@@ -268,6 +321,7 @@ const ProofData= async(req,res)=>{
         editProfile,
         // getProfileimage,
         // getProfileimages,
-        ProofData
+        ProofData,
+        BookingData
 
     }
