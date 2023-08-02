@@ -10,6 +10,7 @@ const Vendor=require('../middleWare/Auth')
 
 vendorRouter.post('/vendorsignup',VendorController.addVendor)
 vendorRouter.post('/vendorlogin',VendorController.VendorLogin)
+ 
 vendorRouter.get('/vendorprofile',Vendor.VendorAuth,VendorController.getProfile)
 vendorRouter.patch('/vendorprofile',VendorController.editVendorProfile)
 vendorRouter.post('/addcategory',HotelController.Addcategory)

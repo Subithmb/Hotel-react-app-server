@@ -12,7 +12,7 @@ const Addcategory=async(req,res)=>{
             return res.status(401).json({ error: "Unauthorized" });
           }
           const jwtToken = req.cookies.jwt.AdminToken;
-          const decodetoken = jwt.verify(jwtToken, "Secretcode");
+          const decodetoken = jwt.verify(jwtToken, process.env.Admin_Key);
       
             const AdminId = decodetoken.id;
             
@@ -67,7 +67,7 @@ const AddHotel=async(req,res)=>{
           }
         
           const jwtToken = req.cookies.jwt.VendorToken;
-          const decodetoken = jwt.verify(jwtToken, "secretCodeforVendor");
+          const decodetoken = jwt.verify(jwtToken, process.env.Vendor_Key);
       
             const vendorId = decodetoken.id;
             
@@ -125,7 +125,7 @@ const hotelData=async(req,res)=>{
           }
       
           const jwtToken = req.cookies.jwt.VendorToken;
-          const decodetoken = jwt.verify(jwtToken, "secretCodeforVendor");
+          const decodetoken = jwt.verify(jwtToken, process.env.Vendor_Key);
       
             const vendorId = decodetoken.id;
         
@@ -206,7 +206,7 @@ const hotelDataUser=async(req,res)=>{
       
           
           const jwtToken = req.cookies.jwt.UserToken;
-          const decodetoken = jwt.verify(jwtToken, "secretCodeforUser");
+          const decodetoken = jwt.verify(jwtToken, process.env.User_Key);
       
           // console.log('jwt',decodetoken);
       
@@ -232,8 +232,8 @@ const singleHotelData=async(req,res)=>{
           }
       
           
-          const jwtToken = req.cookies.jwt.UserToken;
-          const decodetoken = jwt.verify(jwtToken, "secretCodeforUser");
+          const jwtToken = req.cookies.jwt.UserToken;   
+          const decodetoken = jwt.verify(jwtToken, process.env.User_Key);
       
           // console.log('jwt',decodetoken);
       

@@ -42,7 +42,7 @@ const adminLogin = async (req, res) => {
       adminSignup.Status = true;
       adminSignup.name = adminData.name;
       // const Adminname = adminData[0].name
-      let AdminToken = jwt.sign({ id: adminData._id }, "Secretcode", {
+      let AdminToken = jwt.sign({ id: adminData._id }, process.env.Admin_Key, {
         expiresIn: "24h",
       });
       adminSignup.token = AdminToken;
@@ -158,6 +158,7 @@ const UserManage = async (req, res) => {
 
 const UserStatusChange = async (req, res) => {
   try {
+    console.log('userblock');
     const id = req.query.id;
     const userStatus = await User.findOne({ _id: id });
 
@@ -181,7 +182,7 @@ const Addcategory = async (req, res) => {
       return res.status(401).json({ error: "Unauthorized" });
     }
     const jwtToken = req.cookies.jwt.VendorToken;
-    const decodetoken = jwt.verify(jwtToken, "secretCodeforVendor");
+    const decodetoken = jwt.verify(jwtToken, process.env.Vendor_Key);
 
     const vendorId = decodetoken.id;
 
@@ -230,7 +231,7 @@ const getCategory = async (req, res) => {
 //     }
 
 //     const jwtToken = req.cookies.jwt.VendorToken;
-//     const decodetoken = jwt.verify(jwtToken, "secretCodeforVendor");
+//     const decodetoken = jwt.verify(jwtToken, process.env.Vendor_Key);
 
 //     const vendorId = decodetoken.id;
 
@@ -283,7 +284,7 @@ const BookingsDetails=async(req,res)=>{
    
     const jwtToken = req.cookies.jwt.AdminToken;
    
-    const decode=jwt.verify(jwtToken,"Secretcode")
+    const decode=jwt.verify(jwtToken,process.env.Admin_Key)
    
      if(!decode.id){
          throw new Error("Invalid Token")

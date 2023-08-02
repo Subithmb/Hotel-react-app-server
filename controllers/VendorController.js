@@ -44,7 +44,7 @@ const VendorLogin=async(req,res)=>{
             vendorSignup.Status = true;
             vendorSignup.name = VendorData.name;
       // const Adminname = adminData[0].name
-      let VendorToken = jwt.sign({ id: VendorData._id }, "secretCodeforVendor", {
+      let VendorToken = jwt.sign({ id: VendorData._id }, process.env.Vendor_Key, {
         expiresIn: "24h",
       });
       vendorSignup.token = VendorToken;
@@ -79,7 +79,7 @@ const getProfile=async(req,res,next)=>{
   try {
 
     const jwtToken = req.cookies.jwt.VendorToken;
-    const decode=jwt.verify(jwtToken,"secretCodeforVendor")
+    const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
 
      if(!decode.id){
          throw new Error("Invalid Token")
@@ -112,7 +112,7 @@ const getProfile=async(req,res,next)=>{
 const editVendorProfile= async(req,res)=>{
   try {
     const jwtToken = req.cookies.jwt.VendorToken;
-    const decode=jwt.verify(jwtToken,"secretCodeforVendor")
+    const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
    const id=decode.id
 
       if(!decode.id){
@@ -143,7 +143,7 @@ const editProfile= async(req,res)=>{
   try {
      
      const jwtToken = req.cookies.jwt.VendorToken;
-     const decode=jwt.verify(jwtToken,"secretCodeforVendor")
+     const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
 
       if(!decode.id){
           throw new Error("Invalid Token")
@@ -178,7 +178,7 @@ const ProofData= async(req,res)=>{
    
       
      const jwtToken = req.cookies.jwt.VendorToken;
-     const decode=jwt.verify(jwtToken,"secretCodeforVendor")
+     const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
 
       if(!decode.id){
           throw new Error("Invalid Token")
@@ -216,7 +216,7 @@ const ProofData= async(req,res)=>{
 
     
 //     const jwtToken = req.cookies.jwt.VendorToken;
-//     const decodetoken = jwt.verify(jwtToken, "secretCodeforVendor");
+//     const decodetoken = jwt.verify(jwtToken, process.env.Vendor_Key);
 
 //     console.log('jwt',decodetoken);
 
@@ -252,7 +252,7 @@ const ProofData= async(req,res)=>{
 
     
 //     const jwtToken = req.cookies.jwt.VendorToken;
-//     const decodetoken = jwt.verify(jwtToken, "secretCodeforVendor");
+//     const decodetoken = jwt.verify(jwtToken, process.env.Vendor_Key);
 
 //     console.log('jwt',decodetoken);
 
@@ -285,7 +285,7 @@ const BookingData=async(req,res)=>{
   try {
     
     const jwtToken = req.cookies.jwt.VendorToken;
-    const decode=jwt.verify(jwtToken,"secretCodeforVendor")
+    const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
     
      if(!decode.id){
            throw new Error("Invalid Token")

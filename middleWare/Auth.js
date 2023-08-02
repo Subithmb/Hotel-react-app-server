@@ -12,8 +12,8 @@ const VendorAuth = async (req, res, next) => {
         const vendorData = await Vendor.findById({ _id: vendorId });
 
         if (vendorData) {
-            req.id = vendorData._id; // Set the 'id' property in the 'req' object
-            next(); // Call next() with the updated 'req' object
+            req.id = vendorData._id; 
+            next(); 
         } else {
             return res.status(401).json({ error: "Unauthorized" });
         }

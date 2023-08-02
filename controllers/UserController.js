@@ -181,6 +181,11 @@ const addUser = async (req, res) => {
              
             const {email,password}=req.body
            const UserData=await User.findOne({email:email,password:password});
+           if(UserData.status===true){
+            // UserSignup.message = "Your Email blocked by admin";
+            return res.status(500).json({ message: "Your Email blocked by admin" });
+
+           }else{
        
             if(UserData){
                 
@@ -188,7 +193,7 @@ const addUser = async (req, res) => {
                 UserSignup.Status = true;
                 UserSignup.name = UserData.name;
          
-          let UserToken = jwt.sign({ id: UserData._id }, "secretCodeforUser", {
+          let UserToken = jwt.sign({ id: UserData._id }, process.env.User_Key, {
             expiresIn: "24h",
           });
           UserSignup.token = UserToken;
@@ -200,8 +205,7 @@ const addUser = async (req, res) => {
               httpOnly: false,
               maxAge: 6000 * 1000,
             })
-            .status(200)
-            .send({ UserSignup,message:'success...!' })
+            .status(200).send({ UserSignup,message:'success...!' })
              }
            else{
            
@@ -209,6 +213,7 @@ const addUser = async (req, res) => {
             UserSignup.Status = false;
           res.send({ UserSignup });
            }
+          }
             
         } catch (error) {
             console.log(error.message);
@@ -231,7 +236,7 @@ const getProfile=async(req,res,next)=>{
 
     
     const jwtToken = req.cookies.jwt.UserToken;
-    const decodetoken = jwt.verify(jwtToken, "secretCodeforUser");
+    const decodetoken = jwt.verify(jwtToken, process.env.User_Key);
 
     // console.log('jwt',decodetoken);
 
@@ -261,7 +266,7 @@ const editUserProfile= async(req,res)=>{
   try {
     
     const jwtToken = req.cookies.jwt.UserToken;
-    const decode=jwt.verify(jwtToken,"secretCodeforUser")
+    const decode=jwt.verify(jwtToken,process.env.User_Key)
    const id=decode.id
 
       if(!decode.id){
@@ -295,7 +300,7 @@ const editProfilePhoto= async(req,res)=>{
   try {
    
      const jwtToken = req.cookies.jwt.UserToken;
-     const decode=jwt.verify(jwtToken,"secretCodeforUser")
+     const decode=jwt.verify(jwtToken,process.env.User_Key)
 
       if(!decode.id){
           throw new Error("Invalid Token")
@@ -335,7 +340,7 @@ const userBookings=async(req,res)=>{
    
     const jwtToken = req.cookies.jwt.UserToken;
    
-    const decode=jwt.verify(jwtToken,"secretCodeforUser")
+    const decode=jwt.verify(jwtToken,process.env.User_Key)
    
      if(!decode.id){
          throw new Error("Invalid Token")
@@ -356,10 +361,10 @@ const userBookings=async(req,res)=>{
 // ......................getSingleBookingData...............................
 const userBookingsDetail=async(req,res)=>{
   try {
-    console.log('tokencamee');
+    
     const jwtToken = req.cookies.jwt.UserToken;
    
-    const decode=jwt.verify(jwtToken,"secretCodeforUser")
+    const decode=jwt.verify(jwtToken,process.env.User_Key)
    
      if(!decode.id){
          throw new Error("Invalid Token")
@@ -386,7 +391,7 @@ const reviewUpdating=async(req,res)=>{
   try { 
     const jwtToken = req.cookies.jwt.UserToken;
    
-    const decode=jwt.verify(jwtToken,"secretCodeforUser")
+    const decode=jwt.verify(jwtToken,process.env.User_Key)
    
      if(!decode.id){
          throw new Error("Invalid Token")
@@ -397,8 +402,9 @@ const reviewUpdating=async(req,res)=>{
    
      
      const bookingData=await Hotel.findById({_id:req.body.id})
-     console.log(bookingData);
+    
      bookingData.review.push({ userId, feedback, rating });
+     
     bookingData.save()
   
      if(!bookingData){

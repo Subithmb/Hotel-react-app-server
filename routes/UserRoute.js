@@ -8,6 +8,7 @@ const VendorController=require('../controllers/VendorController')
 const UserController=require('../controllers/UserController')
 const HotelController=require('../controllers/HotelController')
 const PaymentController=require('../controllers/PaymentController')
+const ChatController=require('../controllers/ChatController')
 // const otpController =require('../controllers/otpController')
 
 
@@ -26,6 +27,9 @@ userRouter.post('/reviewWriting',UserController.reviewUpdating)
 userRouter.post('/editphoto',upload.single('image'),UserController.editProfilePhoto)
 userRouter.post('/orders',PaymentController.orderCreate)
 userRouter.post('/verify',PaymentController.verify)
+userRouter.get('/chatCreate',ChatController.createChat)
+userRouter.post('/CreateMessage',ChatController.createMessage)
+userRouter.get('/Messages',ChatController.getMessage)
 
 
 module.exports=userRouter

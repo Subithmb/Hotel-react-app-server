@@ -19,7 +19,7 @@ const { format } = require('date-fns');
           //console.log(req.cookies.jwt,'hhhhhhhhhhhhhhhhhhhhh');
          // console.log(req.body);
         const jwtToken = req.cookies.jwt.UserToken;
-        const decode=jwt.verify(jwtToken,"secretCodeforUser")
+        const decode=jwt.verify(jwtToken,process.env.User_Key)
    
          if(!decode.id){
              throw new Error("Invalid Token")
@@ -65,7 +65,7 @@ const { format } = require('date-fns');
 
 const verify=async (req,res)=>{
   try {
-    
+
     if (!req.cookies || !req.cookies.jwt.UserToken) {
       
       return res.status(401).json({ error: "Unauthorized" });
@@ -73,7 +73,7 @@ const verify=async (req,res)=>{
 
     
     const jwtToken = req.cookies.jwt.UserToken;
-    const decodetoken = jwt.verify(jwtToken, "secretCodeforUser");
+    const decodetoken = jwt.verify(jwtToken, process.env.User_Key);
 
     // console.log('jwt',decodetoken);
 
