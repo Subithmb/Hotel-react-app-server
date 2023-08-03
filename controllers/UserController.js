@@ -404,13 +404,59 @@ const reviewUpdating=async(req,res)=>{
      const bookingData=await Hotel.findById({_id:req.body.id})
     
      bookingData.review.push({ userId, feedback, rating });
-     
+
     bookingData.save()
   
      if(!bookingData){
       throw new Error("no booking found")
   }
   res.status(200).send({bookingData,message:"success"})
+
+  } catch (error) {
+    res.status(500).json({error:'Internal server error'});
+  }
+
+}
+
+
+// ......................Cancel Booking...............................
+const CancelBooking=async(req,res)=>{
+  try {
+   
+    const jwtToken = req.cookies.jwt.UserToken;
+   
+    const decode=jwt.verify(jwtToken,process.env.User_Key)
+   
+     if(!decode.id){
+         throw new Error("Invalid Token")
+     }
+    
+     const id=req.query.id
+   
+     
+     const bookingData=await Booking.findById({_id:id}).populate('hotelID')
+    
+    
+     if(bookingData.paymentStatus !==true){
+      res.status(404).json({message:'paymentStatus not true'})
+     
+  }else{
+   
+    if(bookingData.userID ==decode.id)
+    {
+      const UserData = await User.findById({_id:decode.id})
+      UserData.wallet=UserData.wallet+bookingData.UpdatedTotal-bookingData.serviceFee
+      UserData.save()
+      bookingData.BookingStatus='cancelled'
+      bookingData.save()
+      
+      res.status(200).send({bookingData,message:"success"})
+    }
+    else{
+      res.status(404).json({message:'credentials missMatching'})
+    }
+  }
+
 
   } catch (error) {
     res.status(500).json({error:'Internal server error'});
@@ -429,6 +475,7 @@ const reviewUpdating=async(req,res)=>{
         userBookings,
         userBookingsDetail,
         reviewUpdating,
-        otpSending
+        otpSending,
+        CancelBooking
 
     }

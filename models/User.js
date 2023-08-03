@@ -24,6 +24,10 @@ const userSchema = new mongoose.Schema({
       type: "number",
       // required: true
     },
+    wallet: {
+      type: "number",
+      default:0
+    },
     
     status: {
       type: "boolean",

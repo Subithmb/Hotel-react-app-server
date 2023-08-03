@@ -13,6 +13,10 @@ const BookingSchema = new mongoose.Schema({
     paymentId: {
       type: "String", 
     },
+    BookingStatus: {
+      type: "String",
+      default:'Booked' 
+    },
         phone: {
       type: "number",
       required: true

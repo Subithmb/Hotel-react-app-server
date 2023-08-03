@@ -23,6 +23,8 @@ adminRouter.put('/getHotelStatus',HotelController.hotelStatusChange)
 adminRouter.put('/getVendorStatus',adminController.VendorStatusChange)
 adminRouter.post('/updateHotelproofstatus',HotelController.updateproofstatus)
 adminRouter.post('/addCoupon',CouponController.AddCoupon)
+adminRouter.get('/Coupons',CouponController.AllCoupon)
+adminRouter.get('/cancelBooking',adminController.CancelBooking)
 
 adminRouter.get('/bookings',adminController.BookingsDetails)
 adminRouter.post('/CreateMessage',ChatController.createMessage)

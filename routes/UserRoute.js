@@ -30,6 +30,7 @@ userRouter.post('/verify',PaymentController.verify)
 userRouter.get('/chatCreate',ChatController.createChat)
 userRouter.post('/CreateMessage',ChatController.createMessage)
 userRouter.get('/Messages',ChatController.getMessage)
+userRouter.get('/bookingCancel',UserController.CancelBooking)
 
 
 module.exports=userRouter
