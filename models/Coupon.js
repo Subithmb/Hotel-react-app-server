@@ -15,7 +15,11 @@ const couponSchema=new mongoose.Schema({
     
     limit:{type:Number,required:true},
 
-    status:{type:Boolean,default:false}
+    status:{type:Boolean,default:false},
+    users:[
+        {userId: {type:mongoose.Schema.Types.ObjectId,
+             ref:"User"}
+     }]
 
 },{timestamps:true})
 

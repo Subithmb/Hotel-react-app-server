@@ -4,6 +4,7 @@ const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const Booking=require('../models/Booking');
 const Hotel=require('../models/Hotel')
+const moment = require('moment');
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< add admin account >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 const addAdmin = async (req, res) => {
@@ -336,14 +337,6 @@ for (data of hotelDate) {
 
 const CancelBooking=async(req,res)=>{
   try {
-   
-    // const jwtToken = req.cookies.jwt.UserToken;
-   
-    // const decode=jwt.verify(jwtToken,process.env.User_Key)
-   
-    //  if(!decode.id){
-    //      throw new Error("Invalid Token")
-    //  }
     
      const id=req.query.id
    
@@ -378,6 +371,84 @@ const CancelBooking=async(req,res)=>{
 
 }
 
+
+// ................................dash Board..........................
+
+const Dashbord = async (req, res) => {
+  try {
+    
+    const bookingData = await Booking.find({
+      BookingStatus:"Booked" ,
+      paymentStatus:true
+      
+      });
+
+      const userCounts = {};
+      let totalUserCount = 0;
+      let totalRevenue = 0;
+
+      bookingData.forEach(booking => {
+          const userId = booking.userID.toString(); 
+          if (!userCounts[userId]) {
+              userCounts[userId] = 1;
+              totalUserCount++;
+          } else {
+              userCounts[userId]++;
+          }
+          totalRevenue += booking.UpdatedTotal
+      });
+
+     
+    const dayOfWeekCounts = bookingData.reduce((counts, booking) => {
+      const createdAt = moment(booking.createdAt);
+      const dayOfWeek = createdAt.day();
+    
+      if (!counts[dayOfWeek]) {
+        counts[dayOfWeek] = 0;
+      }
+    
+      counts[dayOfWeek]++;
+    
+      return counts;
+    }, {});
+    
+    for (let i = 0; i < 7; i++) {
+      if (!dayOfWeekCounts.hasOwnProperty(i)) {
+        dayOfWeekCounts[i] = 0;
+      }
+    }
+    
+    const chartData = Object.values(dayOfWeekCounts); 
+
+  const monthCounts = moment.monthsShort().reduce((counts, monthName) => {
+    counts[monthName] = 0;
+    return counts;
+  }, {});
+  bookingData.forEach(booking => {
+    const createdAt = moment(booking.createdAt);
+    const monthName = createdAt.format('MMM');
+    monthCounts[monthName]++;
+  });
+
+  const chartDatamonthly = Object.values(monthCounts)
+     
+      const data = {
+        totalBookings: bookingData.length,
+        totalUserCount,
+        totalRevenue,
+        chartData,
+        chartDatamonthly
+    };
+   
+       return res.status(200).json({ data ,message:'Booking Datas'});
+    
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+
+
 module.exports = {
   addAdmin,
   adminLogin,
@@ -389,5 +460,6 @@ module.exports = {
   UserStatusChange,
   BookingsDetails,
   VendorStatusChange,
-  CancelBooking
+  CancelBooking,
+  Dashbord
 };

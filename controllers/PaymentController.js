@@ -13,6 +13,51 @@ const { format } = require('date-fns');
 
 
 
+    const walletpay = async (req, res) => {
+
+       try {
+         
+        
+        const jwtToken = req.cookies.jwt.UserToken;
+        const decode=jwt.verify(jwtToken,process.env.User_Key)
+   
+         if(!decode.id){
+             throw new Error("Invalid Token")
+         }
+         const userID =decode.id
+         
+         if(!userID){
+           throw new Error("user not found")
+          }
+          
+        const{name,phone,total,totalDays,checkIn,checkOut,hotelID,guest,newTotal,tax,fee,selectedPaymentMethod,discount}=req.body
+      const userData=await User.findById({_id:userID})
+
+      if(!userData){
+        throw new Error("user not found")
+      }
+       userData.wallet=userData.wallet-newTotal
+            userData.save();
+
+            const newBooking=new Booking({
+              name,bookingId:userID
+              , phone, total, totalDays,checkIn,checkOut,userID,hotelID,guest,
+              serviceFee:fee,
+              paymentStatus:true,
+              discount:discount,
+              paymentType:selectedPaymentMethod,
+              tax,
+              UpdatedTotal:newTotal
+            })
+            const bookedData=await newBooking.save()
+           
+            res.status(200).json({bookedData})
+                
+       } catch (error) {
+        console.log(error);
+       }
+}
+
     const orderCreate = async (req, res) => {
 
        try {
@@ -179,5 +224,6 @@ transporter.sendMail(mailOptions, (error, info) => {
 
 module.exports={
     orderCreate,
-    verify
+    verify,
+    walletpay
 }

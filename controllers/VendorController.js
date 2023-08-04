@@ -2,7 +2,7 @@ const Vendor=require('../models/Vendor')
 // const User=require('../model/User');
 const jwt = require("jsonwebtoken");
 const cloudinary = require('../middleWare/cloudinary')
-
+const moment = require('moment');
 const Booking=require('../models/Booking');
 const Hotel=require('../models/Hotel')
 
@@ -207,78 +207,6 @@ const ProofData= async(req,res)=>{
 }
 
 
-// const getProfileimage=async(req,res,next)=>{
-//   try {console.log('dpppppppppppppppppppppp',req.cookies.jwt.VendorToken,'mmmmmmmmmmmmmmm');
-//     if (!req.cookies || !req.cookies.jwt.VendorToken) {
-      
-//       return res.status(401).json({ error: "Unauthorized" });
-//     }
-
-    
-//     const jwtToken = req.cookies.jwt.VendorToken;
-//     const decodetoken = jwt.verify(jwtToken, process.env.Vendor_Key);
-
-//     console.log('jwt',decodetoken);
-
-//       const vendorId = decodetoken.id;
-//       try{
-//         const base64=req.body.image
-//         console.log(req.body.image,'looooog');
-      
-//        await Vendor.findOneAndUpdate({ _id: vendorId },{$set:{image:base64}})
-//        const vendor =await Vendor.findOne({ _id:vendorId })
-        
-//       console.log(vendor.image,'uuuuserrrrrrrrrrrrimgggggggggggggggggggg');
-       
-//       if (!vendor) {
-//         return res.status(404).json({ error: "vendor not found" });
-//       } 
-//         return res.status(200).json({ vendor });
-//       } catch (error) {
-//         return res.status(500).json({ error: "Database error" });
-//       }
-   
-//   } catch (error) {
-//     return res.status(403).json({ error: "Token verification failed" });
-//   }
-// }
-
-// const getProfileimages=async(req,res,next)=>{
-//   try {console.log('dpppppppppppppppppppppp',req.cookies.jwt.VendorToken,'mmmmmmmmmmmmmmm');
-//     if (!req.cookies || !req.cookies.jwt.VendorToken) {
-      
-//       return res.status(401).json({ error: "Unauthorized" });
-//     }
-
-    
-//     const jwtToken = req.cookies.jwt.VendorToken;
-//     const decodetoken = jwt.verify(jwtToken, process.env.Vendor_Key);
-
-//     console.log('jwt',decodetoken);
-
-//       const vendorId = decodetoken.id;
-//       try{
-//         const base64=req.body.image
-//         console.log(req.body.image,'looooog');
-      
-//        await Vendor.findOneAndUpdate({ _id: vendorId },{$set:{image:base64}})
-//       //  let vendor =await Vendor.findOne({ _id:vendorId })
-//         vendor=vendor.image
-//       console.log(vendor,'uuuuserrrrrrrrrrrrimgggggggggggggggggggg');
-       
-//       if (!vendor) {
-//         return res.status(404).json({ error: "vendor not found" });
-//       } 
-//         return res.status(200).json({ vendor });
-//       } catch (error) {
-//         return res.status(500).json({ error: "Database error" });
-//       }
-   
-//   } catch (error) {
-//     return res.status(403).json({ error: "Token verification failed" });
-//   }
-// }
-
 // .................................booking data.............................
 
 const BookingData=async(req,res)=>{
@@ -313,15 +241,109 @@ const BookingData=async(req,res)=>{
 }
 
 
+
+// ................................dash Board..........................
+
+const Dashbord = async (req, res) => {
+  try {
+
+    const jwtToken = req.cookies.jwt.VendorToken;
+    const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
+    
+     if(!decode.id){
+           throw new Error("Invalid Token")
+       }
+
+       const partnerId=decode.id
+      
+      const Data = await Booking.find({ paymentStatus: true, BookingStatus:"Booked" }).populate('userID').populate('hotelID')
+
+      const bookingData=await Data.filter((value)=>{
+   
+   return value.hotelID.vendor.toHexString()===partnerId
+ 
+ })
+
+
+
+      const userCounts = {};
+      let totalUserCount = 0;
+      let totalRevenue = 0;
+      let totalTax = 0;
+      let totalVendorRevenue = 0;
+
+      bookingData.forEach(booking => {
+          const userId = booking.userID.toString(); 
+          if (!userCounts[userId]) {
+              userCounts[userId] = 1;
+              totalUserCount++;
+          } else {
+              userCounts[userId]++;
+          }
+          totalRevenue += booking.UpdatedTotal
+          totalVendorRevenue+=booking.total
+          totalTax+=booking.tax
+      });
+
+     
+    const dayOfWeekCounts = bookingData.reduce((counts, booking) => {
+      const createdAt = moment(booking.createdAt);
+      const dayOfWeek = createdAt.day();
+    
+      if (!counts[dayOfWeek]) {
+        counts[dayOfWeek] = 0;
+      }
+    
+      counts[dayOfWeek]++;
+    
+      return counts;
+    }, {});
+    
+    for (let i = 0; i < 7; i++) {
+      if (!dayOfWeekCounts.hasOwnProperty(i)) {
+        dayOfWeekCounts[i] = 0;
+      }
+    }
+    
+    const chartData = Object.values(dayOfWeekCounts); 
+
+  const monthCounts = moment.monthsShort().reduce((counts, monthName) => {
+    counts[monthName] = 0;
+    return counts;
+  }, {});
+  bookingData.forEach(booking => {
+    const createdAt = moment(booking.createdAt);
+    const monthName = createdAt.format('MMM');
+    monthCounts[monthName]++;
+  });
+
+  const chartDatamonthly = Object.values(monthCounts)
+     
+      const data = {
+        totalBookings: bookingData.length,
+        totalUserCount,
+        totalRevenue,
+        chartData,
+        chartDatamonthly
+    };
+   
+       return res.status(200).json({ data ,message:'Booking Datas'});
+    
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+
+
     module.exports={
         addVendor,
         VendorLogin,
         getProfile,
         editVendorProfile,
         editProfile,
-        // getProfileimage,
-        // getProfileimages,
         ProofData,
-        BookingData
+        BookingData,
+        Dashbord
 
     }

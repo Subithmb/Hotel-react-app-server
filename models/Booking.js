@@ -17,6 +17,10 @@ const BookingSchema = new mongoose.Schema({
       type: "String",
       default:'Booked' 
     },
+    paymentType: {
+      type: "String",
+      default:'online' 
+    },
         phone: {
       type: "number",
       required: true
@@ -27,6 +31,7 @@ const BookingSchema = new mongoose.Schema({
     },
     discount: {
       type: "number",
+      default:0
     },
     UpdatedTotal: {
       type: "number",

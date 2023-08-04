@@ -30,4 +30,5 @@ adminRouter.get('/bookings',adminController.BookingsDetails)
 adminRouter.post('/CreateMessage',ChatController.createMessage)
 adminRouter.get('/Messages',ChatController.getAllMessage)
 adminRouter.get('/allChats',ChatController.findChats)
+adminRouter.get('/dashbord',adminController.Dashbord)
 module.exports=adminRouter
