@@ -52,7 +52,7 @@ const VendorLogin=async(req,res)=>{
         VendorToken,
       };
       res
-        .cookie("jwt", obj, {
+        .cookie("jwtOfVendor", obj, {
           httpOnly: false,
           maxAge: 6000 * 1000,
         })
@@ -78,7 +78,7 @@ const VendorLogin=async(req,res)=>{
 const getProfile=async(req,res,next)=>{
   try {
 
-    const jwtToken = req.cookies.jwt.VendorToken;
+    const jwtToken = req.cookies.jwtOfVendor.VendorToken;
     const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
 
      if(!decode.id){
@@ -91,7 +91,7 @@ const getProfile=async(req,res,next)=>{
      }
    
       try{
-      const vendor = await Vendor.findOne({ _id: req.id });
+      const vendor = await Vendor.findOne({ _id:decode.id });
       
        
       if (!vendor) {
@@ -100,7 +100,8 @@ const getProfile=async(req,res,next)=>{
         return res.status(200).json({ vendor });
       } catch (error) {
         return res.status(500).json({ error: "Database error" });
-      }}
+      }
+    }
    
   } catch (error) {
     return res.status(403).json({ error: "Token verification failed" });
@@ -111,11 +112,11 @@ const getProfile=async(req,res,next)=>{
 
 const editVendorProfile= async(req,res)=>{
   try {
-    const jwtToken = req.cookies.jwt.VendorToken;
+    const jwtToken = req.cookies.jwtOfVendor.VendorToken;
     const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
    const id=decode.id
 
-      if(!decode.id){
+      if(!id){
           throw new Error("Invalid Token")
       }
       const{name,phone,email,brand}=req.body.VendorDatas
@@ -142,7 +143,7 @@ const editVendorProfile= async(req,res)=>{
 const editProfile= async(req,res)=>{
   try {
      
-     const jwtToken = req.cookies.jwt.VendorToken;
+     const jwtToken = req.cookies.jwtOfVendor.VendorToken;
      const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
 
       if(!decode.id){
@@ -177,13 +178,13 @@ const ProofData= async(req,res)=>{
   try {
    
       
-     const jwtToken = req.cookies.jwt.VendorToken;
-     const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
+    //  const jwtToken = req.cookies.jwtOfVendor.VendorToken;
+    //  const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
 
-      if(!decode.id){
+      if(!req.id){
           throw new Error("Invalid Token")
       }
-      const vendorData = await Vendor.findOne({_id:decode.id})
+      const vendorData = await Vendor.findOne({_id:req.id})
      // console.log(vendorData,'vennnnnnnnnnnnnnnnnnndor');
 
       if(!vendorData){
@@ -212,7 +213,7 @@ const ProofData= async(req,res)=>{
 const BookingData=async(req,res)=>{
   try {
     
-    const jwtToken = req.cookies.jwt.VendorToken;
+    const jwtToken = req.cookies.jwtOfVendor.VendorToken;
     const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
     
      if(!decode.id){
@@ -221,7 +222,7 @@ const BookingData=async(req,res)=>{
 
        const partnerId=decode.id
       
-      const Data = await Booking.find({ paymentStatus: true }).populate('userID').populate('hotelID')
+      const Data = await Booking.find({ paymentStatus: true,BookingStatus:"Booked" }).populate('userID').populate('hotelID')
 
       const bookingData=await Data.filter((value)=>{
    
@@ -247,24 +248,21 @@ const BookingData=async(req,res)=>{
 const Dashbord = async (req, res) => {
   try {
 
-    const jwtToken = req.cookies.jwt.VendorToken;
+    const jwtToken = req.cookies.jwtOfVendor.VendorToken;
     const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
     
      if(!decode.id){
            throw new Error("Invalid Token")
        }
-
        const partnerId=decode.id
-      
-      const Data = await Booking.find({ paymentStatus: true, BookingStatus:"Booked" }).populate('userID').populate('hotelID')
+       const Data = await Booking.find({ paymentStatus: true, BookingStatus:"Booked" }).populate('userID').populate('hotelID')
+     
 
       const bookingData=await Data.filter((value)=>{
    
    return value.hotelID.vendor.toHexString()===partnerId
  
  })
-
-
 
       const userCounts = {};
       let totalUserCount = 0;
@@ -326,15 +324,13 @@ const Dashbord = async (req, res) => {
         chartData,
         chartDatamonthly
     };
-   
+   console.log(data);
        return res.status(200).json({ data ,message:'Booking Datas'});
     
   } catch (error) {
     console.log(error.message);
   }
 };
-
-
 
     module.exports={
         addVendor,

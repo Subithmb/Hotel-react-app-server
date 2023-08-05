@@ -10,13 +10,13 @@ const createChat=async(req,res)=>{
     try {
 
 
-        if (!req.cookies || !req.cookies.jwt.UserToken) {
+        if (!req.cookies || !req.cookies.jwtOfUser.UserToken) {
       
             return res.status(401).json({ error: "Unauthorized" });
           }
       
           
-          const jwtToken = req.cookies.jwt.UserToken;
+          const jwtToken = req.cookies.jwtOfUser.UserToken;
           const decodetoken = jwt.verify(jwtToken, process.env.User_Key);
       
           // console.log('jwt',decodetoken);

@@ -7,11 +7,11 @@ const cloudinary = require('../middleWare/cloudinary')
 // .............................category............................
 const Addcategory=async(req,res)=>{
     try {
-        if (!req.cookies || !req.cookies.jwt.AdminToken) {
+        if (!req.cookies || !req.cookies.jwtOfAdmin.AdminToken) {
       
             return res.status(401).json({ error: "Unauthorized" });
           }
-          const jwtToken = req.cookies.jwt.AdminToken;
+          const jwtToken = req.cookies.jwtOfAdmin.AdminToken;
           const decodetoken = jwt.verify(jwtToken, process.env.Admin_Key);
       
             const AdminId = decodetoken.id;
@@ -61,15 +61,15 @@ const getCategory=async(req,res)=>{
 const AddHotel=async(req,res)=>{
     try {
        
-        if (!req.cookies || !req.cookies.jwt.VendorToken) {
+        // if (!req.cookies || !req.cookies.jwtOfVendor.VendorToken) {
       
-            return res.status(401).json({ error: "Unauthorized" });
-          }
+        //     return res.status(401).json({ error: "Unauthorized" });
+        //   }
         
-          const jwtToken = req.cookies.jwt.VendorToken;
-          const decodetoken = jwt.verify(jwtToken, process.env.Vendor_Key);
+        //   const jwtToken = req.cookies.jwtOfVendor.VendorToken;
+        //   const decodetoken = jwt.verify(jwtToken, process.env.Vendor_Key);
       
-            const vendorId = decodetoken.id;
+            const vendorId = req.id;
             
             const Vendor = await vendor.findOne({ _id: vendorId,proofstatus:true});
                  
@@ -119,19 +119,12 @@ const AddHotel=async(req,res)=>{
 
 const hotelData=async(req,res)=>{
     try {
-        if (!req.cookies || !req.cookies.jwt.VendorToken) {
-      
-            return res.status(401).json({ error: "Unauthorized" });
-          }
-      
-          const jwtToken = req.cookies.jwt.VendorToken;
-          const decodetoken = jwt.verify(jwtToken, process.env.Vendor_Key);
-      
-            const vendorId = decodetoken.id;
+    
+            const vendorId = req.id
         
             if (vendorId) {
         const hotels=await Hotel.find({vendor:vendorId})
-       
+       console.log(hotels);
        if(hotels){
            return res.status(201).json({hotels})
         }else{
@@ -199,13 +192,13 @@ const hotelStatusChange=async(req,res)=>{
 
 const hotelDataUser=async(req,res)=>{
     try {
-        if (!req.cookies || !req.cookies.jwt.UserToken) {
+        if (!req.cookies || !req.cookies.jwtOfUser.UserToken) {
       
             return res.status(401).json({ error: "Unauthorized" });
           }
       
           
-          const jwtToken = req.cookies.jwt.UserToken;
+          const jwtToken = req.cookies.jwtOfUser.UserToken;
           const decodetoken = jwt.verify(jwtToken, process.env.User_Key);
       
           // console.log('jwt',decodetoken);
@@ -226,13 +219,13 @@ const hotelDataUser=async(req,res)=>{
 
 const singleHotelData=async(req,res)=>{
     try {
-        if (!req.cookies || !req.cookies.jwt.UserToken) {
+        if (!req.cookies || !req.cookies.jwtOfUser.UserToken) {
       
             return res.status(401).json({ error: "Unauthorized" });
           }
       
           
-          const jwtToken = req.cookies.jwt.UserToken;   
+          const jwtToken = req.cookies.jwtOfUser.UserToken;   
           const decodetoken = jwt.verify(jwtToken, process.env.User_Key);
       
           // console.log('jwt',decodetoken);

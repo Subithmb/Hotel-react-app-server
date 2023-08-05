@@ -72,7 +72,7 @@ const AllCoupon = async (req, res) => {
     try {
      
 
-      const jwtToken = req.cookies.jwt.UserToken;
+      const jwtToken = req.cookies.jwtOfUser.UserToken;
    
       const decode=jwt.verify(jwtToken,process.env.User_Key)
      

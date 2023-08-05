@@ -181,6 +181,11 @@ const addUser = async (req, res) => {
              
             const {email,password}=req.body
            const UserData=await User.findOne({email:email,password:password});
+           if(!UserData){
+             UserSignup.Status = false;
+            UserSignup.message = 'invalid user please check userName or password';
+            res.send({ UserSignup });
+           }
            if(UserData.status===true){
             // UserSignup.message = "Your Email blocked by admin";
             return res.status(500).json({ message: "Your Email blocked by admin" });
@@ -201,7 +206,7 @@ const addUser = async (req, res) => {
             UserToken,
           };
           res
-            .cookie("jwt", obj, {
+            .cookie("jwtOfUser", obj, {
               httpOnly: false,
               maxAge: 6000 * 1000,
             })
@@ -217,9 +222,9 @@ const addUser = async (req, res) => {
             
         } catch (error) {
             console.log(error.message);
-            UserSignup.Status = false;
-            UserSignup.message = error;
-            res.send({ UserSignup });
+            // UserSignup.Status = false;
+            // UserSignup.message = error;
+            // res.send({ UserSignup });
             
         }
     }
@@ -229,13 +234,13 @@ const addUser = async (req, res) => {
 const getProfile=async(req,res,next)=>{
   try {
     
-    if (!req.cookies || !req.cookies.jwt.UserToken) {
+    if (!req.cookies || !req.cookies.jwtOfUser.UserToken) {
       
       return res.status(401).json({ error: "Unauthorized" });
     }
 
     
-    const jwtToken = req.cookies.jwt.UserToken;
+    const jwtToken = req.cookies.jwtOfUser.UserToken;
     const decodetoken = jwt.verify(jwtToken, process.env.User_Key);
 
     // console.log('jwt',decodetoken);
@@ -265,7 +270,7 @@ const getProfile=async(req,res,next)=>{
 const editUserProfile= async(req,res)=>{
   try {
     
-    const jwtToken = req.cookies.jwt.UserToken;
+    const jwtToken = req.cookies.jwtOfUser.UserToken;
     const decode=jwt.verify(jwtToken,process.env.User_Key)
    const id=decode.id
 
@@ -299,7 +304,7 @@ const editUserProfile= async(req,res)=>{
 const editProfilePhoto= async(req,res)=>{
   try {
    
-     const jwtToken = req.cookies.jwt.UserToken;
+     const jwtToken = req.cookies.jwtOfUser.UserToken;
      const decode=jwt.verify(jwtToken,process.env.User_Key)
 
       if(!decode.id){
@@ -338,14 +343,14 @@ const editProfilePhoto= async(req,res)=>{
 const userBookings=async(req,res)=>{
   try {
    
-    const jwtToken = req.cookies.jwt.UserToken;
+    const jwtToken = req.cookies.jwtOfUser.UserToken;
    
     const decode=jwt.verify(jwtToken,process.env.User_Key)
    
      if(!decode.id){
          throw new Error("Invalid Token")
      }
-     const bookingData=await Booking.find({userID:decode.id}).populate('hotelID')
+     const bookingData=await Booking.find({userID:decode.id}).populate('hotelID').sort({createdAt:-1})
  
      if(!bookingData){
       throw new Error("no booking found")
@@ -362,7 +367,7 @@ const userBookings=async(req,res)=>{
 const userBookingsDetail=async(req,res)=>{
   try {
     
-    const jwtToken = req.cookies.jwt.UserToken;
+    const jwtToken = req.cookies.jwtOfUser.UserToken;
    
     const decode=jwt.verify(jwtToken,process.env.User_Key)
    
@@ -389,7 +394,7 @@ const userBookingsDetail=async(req,res)=>{
 
 const reviewUpdating=async(req,res)=>{
   try { 
-    const jwtToken = req.cookies.jwt.UserToken;
+    const jwtToken = req.cookies.jwtOfUser.UserToken;
    
     const decode=jwt.verify(jwtToken,process.env.User_Key)
    
@@ -423,7 +428,7 @@ const reviewUpdating=async(req,res)=>{
 const CancelBooking=async(req,res)=>{
   try {
    
-    const jwtToken = req.cookies.jwt.UserToken;
+    const jwtToken = req.cookies.jwtOfUser.UserToken;
    
     const decode=jwt.verify(jwtToken,process.env.User_Key)
    
@@ -435,10 +440,13 @@ const CancelBooking=async(req,res)=>{
    
      
      const bookingData=await Booking.findById({_id:id}).populate('hotelID')
-    
-    
+    console.log(bookingData.BookingStatus,'bookingData');
+     if(!bookingData || bookingData.BookingStatus=="cancelled"){
+ console.log('fgfhfg');
+      return res.status(404).json({message:'data not found'})
+     }
      if(bookingData.paymentStatus !==true){
-      res.status(404).json({message:'paymentStatus not true'})
+      return res.status(404).json({message:'paymentStatus not true'})
      
   }else{
    

@@ -51,7 +51,7 @@ const adminLogin = async (req, res) => {
         AdminToken,
       };
       res
-        .cookie("jwt", obj, {
+        .cookie("jwtOfAdmin", obj, {
           httpOnly: false,
           maxAge: 6000 * 1000,
         })
@@ -177,12 +177,13 @@ const UserStatusChange = async (req, res) => {
 };
 
 // .............................category............................
+// .....marked code
 const Addcategory = async (req, res) => {
   try {
-    if (!req.cookies || !req.cookies.jwt.VendorToken) {
+    if (!req.cookies || !req.cookies.jwtOfVendor.VendorToken) {
       return res.status(401).json({ error: "Unauthorized" });
     }
-    const jwtToken = req.cookies.jwt.VendorToken;
+    const jwtToken = req.cookies.jwtOfVendor.VendorToken;
     const decodetoken = jwt.verify(jwtToken, process.env.Vendor_Key);
 
     const vendorId = decodetoken.id;
@@ -227,11 +228,11 @@ const getCategory = async (req, res) => {
 // ...................................add hotel.....................
 // const AddHotel = async (req, res) => {
 //   try {
-//     if (!req.cookies || !req.cookies.jwt.VendorToken) {
+//     if (!req.cookies || !req.cookies.jwtOfVendor.VendorToken) {
 //       return res.status(401).json({ error: "Unauthorized" });
 //     }
 
-//     const jwtToken = req.cookies.jwt.VendorToken;
+//     const jwtToken = req.cookies.jwtOfVendor.VendorToken;
 //     const decodetoken = jwt.verify(jwtToken, process.env.Vendor_Key);
 
 //     const vendorId = decodetoken.id;
@@ -282,15 +283,15 @@ const getCategory = async (req, res) => {
 // ......................getSingleBookingData...............................
 const BookingsDetails=async(req,res)=>{
   try {
+ 
+    // const jwtToken = req.cookies.jwtOfAdmin.AdminToken;
    
-    const jwtToken = req.cookies.jwt.AdminToken;
+    // const decode=jwt.verify(jwtToken,process.env.Admin_Key)
    
-    const decode=jwt.verify(jwtToken,process.env.Admin_Key)
-   
-     if(!decode.id){
-         throw new Error("Invalid Token")
-     }
-    
+    //  if(!decode.id){
+    //      throw new Error("Invalid Token")
+    //  }
+    console.log(req.id,'req.id');
      const bookingData=await Booking.find().populate('hotelID').populate('userID')
     
      if(!bookingData){
@@ -341,9 +342,12 @@ const CancelBooking=async(req,res)=>{
      const id=req.query.id
    
      
-     const bookingData=await Booking.findById({_id:id}).populate('hotelID')
+     const bookingData=await Booking.findById({_id:id,BookingStatus:'Booked'}).populate('hotelID')
     
-    
+    if(!bookingData){
+
+      res.status(404).json({message:'data not found'})
+    }
      if(bookingData.paymentStatus !==true){
       res.status(404).json({message:'paymentStatus not true'})
      
@@ -447,6 +451,26 @@ const Dashbord = async (req, res) => {
   }
 };
 
+// .................................booking data.............................
+
+const BookingData=async(req,res)=>{
+  try {
+     
+      const bookingData = await Booking.find({ paymentStatus: true ,BookingStatus:"Booked"}).populate('userID').populate('hotelID')
+
+     if(!bookingData){
+      throw new Error("no booking found")
+  }
+  res.status(200).send({bookingData,message:"success"})
+
+  } catch (error) {
+    res.status(500).json({error:'Internal server error'});
+  }
+
+}
+
+
+
 
 
 module.exports = {
@@ -461,5 +485,6 @@ module.exports = {
   BookingsDetails,
   VendorStatusChange,
   CancelBooking,
-  Dashbord
+  Dashbord,
+  BookingData
 };
