@@ -207,7 +207,7 @@ const addUser = async (req, res) => {
           };
           res
             .cookie("jwtOfUser", obj, {
-              httpOnly: true,
+              httpOnly:false,
               maxAge: 6000 * 1000,
               secure:false
             })

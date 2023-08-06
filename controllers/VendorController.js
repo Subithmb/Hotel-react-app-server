@@ -53,7 +53,7 @@ const VendorLogin=async(req,res)=>{
       };
       res
         .cookie("jwtOfVendor", obj, {
-          httpOnly: true,
+          httpOnly: false,
           maxAge: 6000 * 1000,
           secure:false
         })
