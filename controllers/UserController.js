@@ -211,7 +211,7 @@ const addUser = async (req, res) => {
               maxAge: 6000 * 1000,
               secure:false
             })
-           status(200).send({obj, UserSignup,message:'success...!' })
+           .status(200).send({obj, UserSignup,message:'success...!' })
              }
            else{
            
