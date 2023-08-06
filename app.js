@@ -55,8 +55,8 @@ const http = require("http");
 
 // Middleware
 app.use(express.json());
-app.use(cors({ origin: 'http://localhost:3000' , credentials: true }));
-// app.use(cors({ origin: process.env.Cors_URL || 'http://localhost:3000' , credentials: true }));
+// app.use(cors({ origin: 'http://localhost:3000' , credentials: true }));
+app.use(cors({ origin: process.env.Cors_URL || 'http://localhost:3000' , credentials: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.options('*', cors());
@@ -70,8 +70,8 @@ mongoose.connect(process.env.db_Connection).then(() => {
 
     const io = new Server(server, {
         cors: {
-            // origin: process.env.Cors_URL || 'http://localhost:3000',
-            origin: 'http://localhost:3000',
+            origin: process.env.Cors_URL || 'http://localhost:3000',
+            // origin: 'http://localhost:3000',
             methods: ["GET", "POST"],
         },
     });
