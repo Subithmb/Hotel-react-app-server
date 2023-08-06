@@ -51,13 +51,13 @@ const VendorLogin=async(req,res)=>{
       let obj = {
         VendorToken,
       };
-      res
-        .cookie("jwtOfVendor", obj, {
-          httpOnly: false,
-          maxAge: 6000 * 1000,
-          secure:false
-        })
-        .status(200)
+      // res
+      //   .cookie("jwtOfVendor", obj, {
+      //     httpOnly: false,
+      //     maxAge: 6000 * 1000,
+      //     secure:false
+      //   })
+        res.status(200)
         .send({ vendorSignup,message:'success...' })
          }
        else{
@@ -79,7 +79,7 @@ const VendorLogin=async(req,res)=>{
 const getProfile=async(req,res,next)=>{
   try {
 
-    const jwtToken = req.cookies.jwtOfVendor.VendorToken;
+    const jwtToken = req.cookies.jwtOfVendor;
     const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
 
      if(!decode.id){
@@ -113,7 +113,7 @@ const getProfile=async(req,res,next)=>{
 
 const editVendorProfile= async(req,res)=>{
   try {
-    const jwtToken = req.cookies.jwtOfVendor.VendorToken;
+    const jwtToken = req.cookies.jwtOfVendor;
     const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
    const id=decode.id
 
@@ -144,7 +144,7 @@ const editVendorProfile= async(req,res)=>{
 const editProfile= async(req,res)=>{
   try {
      
-     const jwtToken = req.cookies.jwtOfVendor.VendorToken;
+     const jwtToken = req.cookies.jwtOfVendor;
      const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
 
       if(!decode.id){
@@ -179,7 +179,7 @@ const ProofData= async(req,res)=>{
   try {
    
       
-    //  const jwtToken = req.cookies.jwtOfVendor.VendorToken;
+    //  const jwtToken = req.cookies.jwtOfVendor;
     //  const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
 
       if(!req.id){
@@ -214,7 +214,7 @@ const ProofData= async(req,res)=>{
 const BookingData=async(req,res)=>{
   try {
     
-    const jwtToken = req.cookies.jwtOfVendor.VendorToken;
+    const jwtToken = req.cookies.jwtOfVendor;
     const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
     
      if(!decode.id){
@@ -249,7 +249,7 @@ const BookingData=async(req,res)=>{
 const Dashbord = async (req, res) => {
   try {
 
-    const jwtToken = req.cookies.jwtOfVendor.VendorToken;
+    const jwtToken = req.cookies.jwtOfVendor;
     const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
     
      if(!decode.id){

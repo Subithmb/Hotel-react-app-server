@@ -205,13 +205,13 @@ const addUser = async (req, res) => {
           let obj = {
             UserToken,
           };
-          res
-            .cookie("jwtOfUser", obj, {
-              httpOnly:false,
-              maxAge: 6000 * 1000,
-              secure:false
-            })
-            .status(200).send({ UserSignup,message:'success...!' })
+          // res
+          // .cookie("jwtOfUser", obj, {
+          //     httpOnly:false,
+          //     maxAge: 6000 * 1000,
+          //     secure:false
+          //   })
+            res.status(200).send({obj, UserSignup,message:'success...!' })
              }
            else{
            
@@ -235,13 +235,13 @@ const addUser = async (req, res) => {
 const getProfile=async(req,res,next)=>{
   try {
     
-    if (!req.cookies || !req.cookies.jwtOfUser.UserToken) {
+    if (!req.cookies || !req.cookies.jwtOfUser) {
       
       return res.status(401).json({ error: "Unauthorized" });
     }
 
     
-    const jwtToken = req.cookies.jwtOfUser.UserToken;
+    const jwtToken = req.cookies.jwtOfUser;
     const decodetoken = jwt.verify(jwtToken, process.env.User_Key);
 
     // console.log('jwt',decodetoken);
@@ -271,7 +271,7 @@ const getProfile=async(req,res,next)=>{
 const editUserProfile= async(req,res)=>{
   try {
     
-    const jwtToken = req.cookies.jwtOfUser.UserToken;
+    const jwtToken = req.cookies.jwtOfUser;
     const decode=jwt.verify(jwtToken,process.env.User_Key)
    const id=decode.id
 
@@ -305,7 +305,7 @@ const editUserProfile= async(req,res)=>{
 const editProfilePhoto= async(req,res)=>{
   try {
    
-     const jwtToken = req.cookies.jwtOfUser.UserToken;
+     const jwtToken = req.cookies.jwtOfUser;
      const decode=jwt.verify(jwtToken,process.env.User_Key)
 
       if(!decode.id){
@@ -344,7 +344,7 @@ const editProfilePhoto= async(req,res)=>{
 const userBookings=async(req,res)=>{
   try {
    
-    const jwtToken = req.cookies.jwtOfUser.UserToken;
+    const jwtToken = req.cookies.jwtOfUser;
    
     const decode=jwt.verify(jwtToken,process.env.User_Key)
    
@@ -368,7 +368,7 @@ const userBookings=async(req,res)=>{
 const userBookingsDetail=async(req,res)=>{
   try {
     
-    const jwtToken = req.cookies.jwtOfUser.UserToken;
+    const jwtToken = req.cookies.jwtOfUser;
    
     const decode=jwt.verify(jwtToken,process.env.User_Key)
    
@@ -395,7 +395,7 @@ const userBookingsDetail=async(req,res)=>{
 
 const reviewUpdating=async(req,res)=>{
   try { 
-    const jwtToken = req.cookies.jwtOfUser.UserToken;
+    const jwtToken = req.cookies.jwtOfUser;
    
     const decode=jwt.verify(jwtToken,process.env.User_Key)
    
@@ -429,7 +429,7 @@ const reviewUpdating=async(req,res)=>{
 const CancelBooking=async(req,res)=>{
   try {
    
-    const jwtToken = req.cookies.jwtOfUser.UserToken;
+    const jwtToken = req.cookies.jwtOfUser;
    
     const decode=jwt.verify(jwtToken,process.env.User_Key)
    

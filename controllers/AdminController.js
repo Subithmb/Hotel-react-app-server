@@ -50,13 +50,13 @@ const adminLogin = async (req, res) => {
       let obj = {
         AdminToken,
       };
-      res
-        .cookie("jwtOfAdmin", obj, {
-          httpOnly:false,
-              maxAge: 6000 * 1000,
-              secure:false
-        })
-        .status(200)
+      // res
+      //   .cookie("jwtOfAdmin", obj, {
+      //     httpOnly:false,
+      //         maxAge: 6000 * 1000,
+      //         secure:false
+      //   })
+        res.status(200)
         .send({ adminSignup });
     } else {
       adminSignup.message = "Your Email or Password wrong";
@@ -181,10 +181,10 @@ const UserStatusChange = async (req, res) => {
 // .....marked code
 const Addcategory = async (req, res) => {
   try {
-    if (!req.cookies || !req.cookies.jwtOfVendor.VendorToken) {
+    if (!req.cookies || !req.cookies.jwtOfVendor) {
       return res.status(401).json({ error: "Unauthorized" });
     }
-    const jwtToken = req.cookies.jwtOfVendor.VendorToken;
+    const jwtToken = req.cookies.jwtOfVendor;
     const decodetoken = jwt.verify(jwtToken, process.env.Vendor_Key);
 
     const vendorId = decodetoken.id;
@@ -229,11 +229,11 @@ const getCategory = async (req, res) => {
 // ...................................add hotel.....................
 // const AddHotel = async (req, res) => {
 //   try {
-//     if (!req.cookies || !req.cookies.jwtOfVendor.VendorToken) {
+//     if (!req.cookies || !req.cookies.jwtOfVendor) {
 //       return res.status(401).json({ error: "Unauthorized" });
 //     }
 
-//     const jwtToken = req.cookies.jwtOfVendor.VendorToken;
+//     const jwtToken = req.cookies.jwtOfVendor;
 //     const decodetoken = jwt.verify(jwtToken, process.env.Vendor_Key);
 
 //     const vendorId = decodetoken.id;
@@ -285,7 +285,7 @@ const getCategory = async (req, res) => {
 const BookingsDetails=async(req,res)=>{
   try {
  
-    // const jwtToken = req.cookies.jwtOfAdmin.AdminToken;
+    // const jwtToken = req.cookies.jwtOfAdmin;
    
     // const decode=jwt.verify(jwtToken,process.env.Admin_Key)
    

@@ -5,12 +5,12 @@ const jwt = require("jsonwebtoken");
 const VendorAuth = async (req, res, next) => {
     try {
         console.log('request of vendor');
-        console.log(req.cookies.jwtOfVendor.VendorToken);
-        if (!req.cookies || !req.cookies.jwtOfVendor.VendorToken) {
+        console.log(req.cookies.jwtOfVendor);
+        if (!req.cookies || !req.cookies.jwtOfVendor) {
             return res.status(401).json({ error: "Unauthorized" });
         }
 
-        const jwtToken = req.cookies.jwtOfVendor.VendorToken;
+        const jwtToken = req.cookies.jwtOfVendor;
         const decodetoken = jwt.verify(jwtToken, process.env.Vendor_Key);
         const vendorId = decodetoken.id;
         const vendorData = await Vendor.findById({ _id: vendorId });
@@ -32,12 +32,12 @@ const AdminAuth = async (req, res, next) => {
     try {
         console.log('request by Admin');
 
-console.log(req.cookies.jwtOfAdmin.AdminToken);
-        if (!req.cookies || !req.cookies.jwtOfAdmin.AdminToken) {
+console.log(req.cookies.jwtOfAdmin);
+        if (!req.cookies || !req.cookies.jwtOfAdmin) {
             return res.status(401).json({ error: "Unauthorized" });
         }
 
-        const jwtToken = req.cookies.jwtOfAdmin.AdminToken;
+        const jwtToken = req.cookies.jwtOfAdmin;
         const decodetoken = jwt.verify(jwtToken, process.env.Admin_Key);
         const vendorId = decodetoken.id;
         const AdminData = await Admin.findById({ _id: vendorId });
@@ -60,13 +60,13 @@ console.log(req.cookies.jwtOfAdmin.AdminToken);
 const UserAuth = async (req, res, next) => {
     try {
         console.log('request by User');
-        console.log(req.cookies.jwtOfUser.UserToken);
+        console.log(req.cookies.jwtOfUser);
 
-        if (!req.cookies || !req.cookies.jwtOfUser.UserToken) {
+        if (!req.cookies || !req.cookies.jwtOfUser) {
             return res.status(401).json({ error: "Unauthorized" });
         }
 
-        const jwtToken =req.cookies.jwtOfUser.UserToken;
+        const jwtToken =req.cookies.jwtOfUser;
         const decodetoken = jwt.verify(jwtToken, process.env.User_Key);
         const UserId = decodetoken.id;
         const UserData = await User.findById({ _id: UserId });
