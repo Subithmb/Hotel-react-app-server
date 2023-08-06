@@ -205,13 +205,13 @@ const addUser = async (req, res) => {
           let obj = {
             UserToken,
           };
-          // res
-          // .cookie("jwtOfUser", obj, {
-          //     httpOnly:false,
-          //     maxAge: 6000 * 1000,
-          //     secure:false
-          //   })
-            res.status(200).send({obj, UserSignup,message:'success...!' })
+          res
+          .cookie("jwtOfUser",UserToken, {
+              httpOnly:false,
+              maxAge: 6000 * 1000,
+              secure:false
+            })
+           status(200).send({obj, UserSignup,message:'success...!' })
              }
            else{
            

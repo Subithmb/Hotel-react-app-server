@@ -60,7 +60,7 @@ console.log(req.cookies.jwtOfAdmin);
 const UserAuth = async (req, res, next) => {
     try {
         console.log('request by User');
-        console.log(req.cookies.jwtOfUser);
+        console.log(req.cookies.jwtOfUser,'jwtOfUser');
 
         if (!req.cookies || !req.cookies.jwtOfUser) {
             return res.status(401).json({ error: "Unauthorized" });
