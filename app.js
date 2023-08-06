@@ -52,11 +52,14 @@ const nodemailer = require('nodemailer');
 const cloudinary = require('cloudinary').v2;
 const { Server } = require('socket.io');
 const http = require("http");
-
+const corsOrigin = process.env.Cors_URL || 'http://localhost:3000'
 // Middleware
 app.use(express.json());
 // app.use(cors({ origin: 'http://localhost:3000' , credentials: true }));
-app.use(cors({ origin: process.env.Cors_URL || 'http://localhost:3000' , credentials: true }));
+
+// app.use(cors({ origin: corsOrigin , credentials: true }));
+app.use(cors({ origin: corsOrigin, credentials: true }));
+
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.options('*', cors());
@@ -68,13 +71,21 @@ app.use("/vendor", vendorRouter);
 mongoose.connect(process.env.db_Connection).then(() => {
     const server = http.createServer(app);
 
+    // const io = new Server(server, {
+    //     cors: {
+    //         origin: corsOrigin,
+    //         // origin: 'http://localhost:3000',
+    //         methods: ["GET", "POST"],
+    //     },
+    // });
+
     const io = new Server(server, {
         cors: {
-            origin: process.env.Cors_URL || 'http://localhost:3000',
-            // origin: 'http://localhost:3000',
+            origin: corsOrigin,
             methods: ["GET", "POST"],
         },
     });
+    
 
     io.on("connection", (socket) => {
         console.log(`User Connected: ${socket.id}`);
