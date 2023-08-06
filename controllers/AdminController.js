@@ -52,8 +52,9 @@ const adminLogin = async (req, res) => {
       };
       res
         .cookie("jwtOfAdmin", obj, {
-          httpOnly: false,
-          maxAge: 6000 * 1000,
+          httpOnly: true,
+              maxAge: 6000 * 1000,
+              secure:false
         })
         .status(200)
         .send({ adminSignup });

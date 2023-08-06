@@ -53,8 +53,9 @@ const VendorLogin=async(req,res)=>{
       };
       res
         .cookie("jwtOfVendor", obj, {
-          httpOnly: false,
+          httpOnly: true,
           maxAge: 6000 * 1000,
+          secure:false
         })
         .status(200)
         .send({ vendorSignup,message:'success...' })
@@ -256,10 +257,7 @@ const Dashbord = async (req, res) => {
        }
        const partnerId=decode.id
        const Data = await Booking.find({ paymentStatus: true, BookingStatus:"Booked" }).populate('userID').populate('hotelID')
-     
-
       const bookingData=await Data.filter((value)=>{
-   
    return value.hotelID.vendor.toHexString()===partnerId
  
  })
@@ -304,7 +302,6 @@ const Dashbord = async (req, res) => {
     }
     
     const chartData = Object.values(dayOfWeekCounts); 
-
   const monthCounts = moment.monthsShort().reduce((counts, monthName) => {
     counts[monthName] = 0;
     return counts;
@@ -324,13 +321,15 @@ const Dashbord = async (req, res) => {
         chartData,
         chartDatamonthly
     };
-   console.log(data);
+  
        return res.status(200).json({ data ,message:'Booking Datas'});
     
   } catch (error) {
     console.log(error.message);
   }
 };
+
+
 
     module.exports={
         addVendor,
