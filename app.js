@@ -153,7 +153,7 @@ const customCors = (req, callback) => {
     // Allow CORS for the main origin or specific endpoints
     if (requestedEndpoint === 'admin' || requestedEndpoint === 'vendor') {
       callback(null, true);
-    } else if (req.header('Origin') === corsOrigin) {
+    } else if (originalUrl == corsOrigin) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
