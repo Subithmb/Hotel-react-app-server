@@ -127,19 +127,39 @@ const http = require("http");
 const corsOrigin = process.env.Cors_URL || 'http://localhost:3000';
 
 
-const customCors = (req, callback) => {
+// const customCors = (req, callback) => {
  
-  const requestedEndpoint = req.originalUrl.split('/')[1];
+//   const requestedEndpoint = req.originalUrl.split('/')[1];
   
   
-  if (requestedEndpoint === 'admin' || requestedEndpoint === 'vendor') {
-    callback(null, true);
-  } else if (req.header('Origin') === corsOrigin) {
-    callback(null, true);
-  } else {
-    callback(new Error('Not allowed by CORS'));
-  }
-};
+//   if (requestedEndpoint === 'admin' || requestedEndpoint === 'vendor') {
+//     callback(null, true);
+//   } else if (req.header('Origin') === corsOrigin) {
+//     callback(null, true);
+//   } else {
+//     callback(new Error('Not allowed by CORS'));
+//   }
+// };
+
+// Custom CORS middleware to handle multiple endpoints
+const customCors = (req, callback) => {
+    // Extract the requested endpoint from the URL
+    const originalUrl = req.originalUrl || '';
+  
+    const requestedEndpoint = originalUrl.split('/')[1];
+
+    
+    
+    // Allow CORS for the main origin or specific endpoints
+    if (requestedEndpoint === 'admin' || requestedEndpoint === 'vendor') {
+      callback(null, true);
+    } else if (req.header('Origin') === corsOrigin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  };
+  
 
 // Middleware
 app.use(express.json());
