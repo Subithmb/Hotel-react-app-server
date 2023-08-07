@@ -198,20 +198,31 @@ const addUser = async (req, res) => {
                 UserSignup.Status = true;
                 UserSignup.name = UserData.name;
          
-          let UserToken = jwt.sign({ id: UserData._id }, process.env.User_Key, {
+          let UserToken =await jwt.sign({ id: UserData._id }, process.env.User_Key, {
             expiresIn: "24h",
           });
           UserSignup.token = UserToken;
           let obj = {
             UserToken,
           };
-          res
-          .cookie("jwtOfUser",UserToken, {
-              httpOnly:false,
-              maxAge: 6000 * 1000,
-              secure:false
-            })
-           .status(200).send({obj, UserSignup,message:'success...!' })
+          // res
+          // .cookie("jwtOfUser",UserToken, {
+          //     httpOnly:false,
+          //     maxAge: 6000 * 1000,
+          //     secure:false
+          //   })
+          //  .status(200).send({obj, UserSignup,message:'success...!' })
+
+           res.cookie("jwtOfUser", UserToken, {
+            httpOnly: false,
+            maxAge: 6000 * 1000,
+            secure: true, 
+            domain: 'empirehotel.netlify.app',
+            path: '/',
+        }).status(200).send({obj, UserSignup,message:'success...!' })
+        
+
+           
              }
            else{
            
