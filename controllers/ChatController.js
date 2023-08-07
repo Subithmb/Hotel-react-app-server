@@ -10,18 +10,18 @@ const createChat=async(req,res)=>{
     try {
 
 
-        if (!req.cookies || !req.cookies.jwtOfUser) {
+        // if (!req.cookies || !req.cookies.jwtOfUser) {
       
-            return res.status(401).json({ error: "Unauthorized" });
-          }
+        //     return res.status(401).json({ error: "Unauthorized" });
+        //   }
       
           
-          const jwtToken = req.cookies.jwtOfUser;
-          const decodetoken = jwt.verify(jwtToken, process.env.User_Key);
+        //   const jwtToken = req.cookies.jwtOfUser;
+        //   const decodetoken = jwt.verify(jwtToken, process.env.User_Key);
       
           // console.log('jwt',decodetoken);
       
-        const userId = decodetoken.id;
+        const userId =req.id
         const adminData=await Admin.findOne()
         const adminId=adminData._id
 

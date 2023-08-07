@@ -79,20 +79,20 @@ const VendorLogin=async(req,res)=>{
 const getProfile=async(req,res,next)=>{
   try {
 
-    const jwtToken = req.cookies.jwtOfVendor;
-    const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
+    // const jwtToken = req.cookies.jwtOfVendor;
+    // const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
 
-     if(!decode.id){
+     if(!req.id){
          throw new Error("Invalid Token")
      }else{
-     const vendorData = await Vendor.findOne({_id:decode.id})
+     const vendorData = await Vendor.findOne({_id:req.id})
    
      if(!vendorData){
          throw new Error("vendor not found")
      }
    
       try{
-      const vendor = await Vendor.findOne({ _id:decode.id });
+      const vendor = await Vendor.findOne({ _id:req.id });
       
        
       if (!vendor) {
@@ -113,16 +113,16 @@ const getProfile=async(req,res,next)=>{
 
 const editVendorProfile= async(req,res)=>{
   try {
-    const jwtToken = req.cookies.jwtOfVendor;
-    const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
-   const id=decode.id
+    // const jwtToken = req.cookies.jwtOfVendor;
+    // const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
+   const id=req.id
 
       if(!id){
           throw new Error("Invalid Token")
       }
       const{name,phone,email,brand}=req.body.VendorDatas
       console.log(name);
-      await Vendor.findByIdAndUpdate({_id:decode.id},{$set:{name:name,phone:phone,email:email,brand:brand}})
+      await Vendor.findByIdAndUpdate({_id:req.id},{$set:{name:name,phone:phone,email:email,brand:brand}})
 
       const vendorData = await Vendor.findById({_id:id})
       console.log(vendorData,'decodeveendor');
@@ -144,13 +144,12 @@ const editVendorProfile= async(req,res)=>{
 const editProfile= async(req,res)=>{
   try {
      
-     const jwtToken = req.cookies.jwtOfVendor;
-     const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
+   
 
-      if(!decode.id){
+      if(!req.id){
           throw new Error("Invalid Token")
       }
-      const vendorData = await Vendor.findOne({_id:decode.id})
+      const vendorData = await Vendor.findOne({_id:req.id})
     console.log(vendorData);
 
       if(!vendorData){
@@ -214,14 +213,14 @@ const ProofData= async(req,res)=>{
 const BookingData=async(req,res)=>{
   try {
     
-    const jwtToken = req.cookies.jwtOfVendor;
-    const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
+    // const jwtToken = req.cookies.jwtOfVendor;
+    // const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
     
-     if(!decode.id){
+     if(!req.id){
            throw new Error("Invalid Token")
        }
 
-       const partnerId=decode.id
+       const partnerId=req.id
       
       const Data = await Booking.find({ paymentStatus: true,BookingStatus:"Booked" }).populate('userID').populate('hotelID')
 
@@ -249,13 +248,13 @@ const BookingData=async(req,res)=>{
 const Dashbord = async (req, res) => {
   try {
 
-    const jwtToken = req.cookies.jwtOfVendor;
-    const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
+    // const jwtToken = req.cookies.jwtOfVendor;
+    // const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
     
-     if(!decode.id){
+     if(!req.id){
            throw new Error("Invalid Token")
        }
-       const partnerId=decode.id
+       const partnerId=req.id
        const Data = await Booking.find({ paymentStatus: true, BookingStatus:"Booked" }).populate('userID').populate('hotelID')
       const bookingData=await Data.filter((value)=>{
    return value.hotelID.vendor.toHexString()===partnerId

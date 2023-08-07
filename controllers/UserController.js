@@ -172,6 +172,8 @@ const addUser = async (req, res) => {
     const UserLogin=async(req,res)=>{
    
         try {
+          console.log('cameeeeeeeee');
+
             let UserSignup = {
                 Status: false,
                 message: null,
@@ -246,18 +248,8 @@ const addUser = async (req, res) => {
 const getProfile=async(req,res,next)=>{
   try {
     
-    if (!req.cookies || !req.cookies.jwtOfUser) {
-      
-      return res.status(401).json({ error: "Unauthorized" });
-    }
 
-    
-    const jwtToken = req.cookies.jwtOfUser;
-    const decodetoken = jwt.verify(jwtToken, process.env.User_Key);
-
-    // console.log('jwt',decodetoken);
-
-      const userId = decodetoken.id;
+      const userId = req.id
      
       try{
       const userData = await User.findOne({ _id: userId });
@@ -282,11 +274,9 @@ const getProfile=async(req,res,next)=>{
 const editUserProfile= async(req,res)=>{
   try {
     
-    const jwtToken = req.cookies.jwtOfUser;
-    const decode=jwt.verify(jwtToken,process.env.User_Key)
-   const id=decode.id
+   const id= req.id
 
-      if(!decode.id){
+      if(!id){
           throw new Error("Invalid Token")
       }
       const{name,phone,email}=req.body.UserDatas
@@ -316,13 +306,13 @@ const editUserProfile= async(req,res)=>{
 const editProfilePhoto= async(req,res)=>{
   try {
    
-     const jwtToken = req.cookies.jwtOfUser;
-     const decode=jwt.verify(jwtToken,process.env.User_Key)
+     
+     const id= req.id
 
-      if(!decode.id){
+      if(!id){
           throw new Error("Invalid Token")
       }
-      const userData = await User.findOne({_id:decode.id})
+      const userData = await User.findOne({_id:id})
     
 
       if(!userData){
@@ -355,14 +345,10 @@ const editProfilePhoto= async(req,res)=>{
 const userBookings=async(req,res)=>{
   try {
    
-    const jwtToken = req.cookies.jwtOfUser;
-   
-    const decode=jwt.verify(jwtToken,process.env.User_Key)
-   
-     if(!decode.id){
+     if(! req.id){
          throw new Error("Invalid Token")
      }
-     const bookingData=await Booking.find({userID:decode.id}).populate('hotelID').sort({createdAt:-1})
+     const bookingData=await Booking.find({userID:req.id}).populate('hotelID').sort({createdAt:-1})
  
      if(!bookingData){
       throw new Error("no booking found")
@@ -379,11 +365,8 @@ const userBookings=async(req,res)=>{
 const userBookingsDetail=async(req,res)=>{
   try {
     
-    const jwtToken = req.cookies.jwtOfUser;
    
-    const decode=jwt.verify(jwtToken,process.env.User_Key)
-   
-     if(!decode.id){
+     if(! req.id){
          throw new Error("Invalid Token")
      }
      const id=req.query.id
@@ -406,14 +389,11 @@ const userBookingsDetail=async(req,res)=>{
 
 const reviewUpdating=async(req,res)=>{
   try { 
-    const jwtToken = req.cookies.jwtOfUser;
-   
-    const decode=jwt.verify(jwtToken,process.env.User_Key)
-   
-     if(!decode.id){
+    
+     if(! req.id){
          throw new Error("Invalid Token")
      }
-     const userId=decode.id
+     const userId= req.id
      const feedback=req.body.review
      const rating=req.body.value
    
@@ -440,11 +420,9 @@ const reviewUpdating=async(req,res)=>{
 const CancelBooking=async(req,res)=>{
   try {
    
-    const jwtToken = req.cookies.jwtOfUser;
+    
    
-    const decode=jwt.verify(jwtToken,process.env.User_Key)
-   
-     if(!decode.id){
+     if(! req.id){
          throw new Error("Invalid Token")
      }
     
@@ -462,9 +440,12 @@ const CancelBooking=async(req,res)=>{
      
   }else{
    
-    if(bookingData.userID ==decode.id)
+  
+    if(bookingData.userID.toString() === req.id.toString())
     {
-      const UserData = await User.findById({_id:decode.id})
+   
+      const UserData = await User.findById({_id:req.id})
+   
       UserData.wallet=UserData.wallet+bookingData.UpdatedTotal-bookingData.serviceFee
       UserData.save()
       bookingData.BookingStatus='cancelled'

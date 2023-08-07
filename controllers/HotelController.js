@@ -7,14 +7,14 @@ const cloudinary = require('../middleWare/cloudinary')
 // .............................category............................
 const Addcategory=async(req,res)=>{
     try {
-        if (!req.cookies || !req.cookies.jwtOfAdmin) {
+        // if (!req.cookies || !req.cookies.jwtOfAdmin) {
       
-            return res.status(401).json({ error: "Unauthorized" });
-          }
-          const jwtToken = req.cookies.jwtOfAdmin;
-          const decodetoken = jwt.verify(jwtToken, process.env.Admin_Key);
+        //     return res.status(401).json({ error: "Unauthorized" });
+        //   }
+        //   const jwtToken = req.cookies.jwtOfAdmin;
+        //   const decodetoken = jwt.verify(jwtToken, process.env.Admin_Key);
       
-            const AdminId = decodetoken.id;
+            const AdminId = req.id;
             
             const AdminData = await Admin.findOne({ _id: AdminId });
              
@@ -192,18 +192,19 @@ const hotelStatusChange=async(req,res)=>{
 
 const hotelDataUser=async(req,res)=>{
     try {
-        if (!req.cookies || !req.cookies.jwtOfUser) {
+        // console.log('dfgdgdgmmmmmmmmmmmmmmmm');
+        // if (!req.cookies || !req.cookies.jwtOfUser) {
       
-            return res.status(401).json({ error: "Unauthorized" });
-          }
+        //     return res.status(401).json({ error: "Unauthorized" });
+        //   }
       
           
-          const jwtToken = req.cookies.jwtOfUser;
-          const decodetoken = jwt.verify(jwtToken, process.env.User_Key);
+        //   const jwtToken = req.cookies.jwtOfUser;
+        //   const decodetoken = jwt.verify(jwtToken, process.env.User_Key);
       
           // console.log('jwt',decodetoken);
       
-            const userId = decodetoken.id;
+           
        const hotels=await Hotel.find({proofstatus:true,status:false,adminStatus:false}).populate('review')
        if(hotels){
        const categoryData=await category.find({})
@@ -219,18 +220,18 @@ const hotelDataUser=async(req,res)=>{
 
 const singleHotelData=async(req,res)=>{
     try {
-        if (!req.cookies || !req.cookies.jwtOfUser) {
+        // if (!req.cookies || !req.cookies.jwtOfUser) {
       
-            return res.status(401).json({ error: "Unauthorized" });
-          }
+        //     return res.status(401).json({ error: "Unauthorized" });
+        //   }
       
           
-          const jwtToken = req.cookies.jwtOfUser;   
-          const decodetoken = jwt.verify(jwtToken, process.env.User_Key);
+        //   const jwtToken = req.cookies.jwtOfUser;   
+        //   const decodetoken = jwt.verify(jwtToken, process.env.User_Key);
       
           // console.log('jwt',decodetoken);
       
-            const userId = decodetoken.id;
+            const userId =req.id;
         const id =req.params.id
        const hotels=await Hotel.find({_id:id,proofstatus:true,status:false}).populate('review.userId')
        if(hotels){

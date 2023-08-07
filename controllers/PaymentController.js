@@ -18,13 +18,13 @@ const { format } = require('date-fns');
        try {
          
         
-        const jwtToken = req.cookies.jwtOfUser;
-        const decode=jwt.verify(jwtToken,process.env.User_Key)
+        // const jwtToken = req.cookies.jwtOfUser;
+        // const decode=jwt.verify(jwtToken,process.env.User_Key)
    
-         if(!decode.id){
+         if(!req.id){
              throw new Error("Invalid Token")
          }
-         const userID =decode.id
+         const userID =req.id
          
          if(!userID){
            throw new Error("user not found")
@@ -63,13 +63,13 @@ const { format } = require('date-fns');
        try {
           //console.log(req.cookies.jwt,'hhhhhhhhhhhhhhhhhhhhh');
          // console.log(req.body);
-        const jwtToken = req.cookies.jwtOfUser;
-        const decode=jwt.verify(jwtToken,process.env.User_Key)
+        // const jwtToken = req.cookies.jwtOfUser;
+        // const decode=jwt.verify(jwtToken,process.env.User_Key)
    
-         if(!decode.id){
+         if(!req.id){
              throw new Error("Invalid Token")
          }
-         const userID =decode.id
+         const userID =req.id
          
          if(!userID){
            throw new Error("user not found")
@@ -111,18 +111,18 @@ const { format } = require('date-fns');
 const verify=async (req,res)=>{
   try {
 
-    if (!req.cookies || !req.cookies.jwtOfUser) {
+    // if (!req.cookies || !req.cookies.jwtOfUser) {
       
-      return res.status(401).json({ error: "Unauthorized" });
-    }
+    //   return res.status(401).json({ error: "Unauthorized" });
+    // }
 
     
-    const jwtToken = req.cookies.jwtOfUser;
-    const decodetoken = jwt.verify(jwtToken, process.env.User_Key);
+    // const jwtToken = req.cookies.jwtOfUser;
+    // const decodetoken = jwt.verify(jwtToken, process.env.User_Key);
 
     // console.log('jwt',decodetoken);
 
-      const userId = decodetoken.id;
+      const userId = req.id
 
    
     const { razorpay_order_id,razorpay_payment_id,razorpay_signature} = req.body;

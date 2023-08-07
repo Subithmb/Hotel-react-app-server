@@ -37,6 +37,7 @@
 //   api_secret: process.env.your_api_secret
 // });
 
+// .................. working..................................
 
 const cookieParser = require("cookie-parser");
 const express = require('express');
@@ -52,7 +53,7 @@ const nodemailer = require('nodemailer');
 const cloudinary = require('cloudinary').v2;
 const { Server } = require('socket.io');
 const http = require("http");
-const corsOrigin = process.env.Cors_URL || `${process.env.Cors_URL}/*` || 'http://localhost:3000'
+const corsOrigin = [process.env.Cors_URL,'http://localhost:3000']
 // Middleware
 app.use(express.json());
 // app.use(cors({ origin: 'http://localhost:3000' , credentials: true }));
@@ -109,6 +110,7 @@ cloudinary.config({
     api_secret: process.env.your_api_secret
 });
 
+// ...................................................
 
 // const cookieParser = require("cookie-parser");
 // const express = require('express');

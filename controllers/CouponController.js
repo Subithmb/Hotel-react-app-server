@@ -72,16 +72,16 @@ const AllCoupon = async (req, res) => {
     try {
      
 
-      const jwtToken = req.cookies.jwtOfUser;
+      // const jwtToken = req.cookies.jwtOfUser;
    
-      const decode=jwt.verify(jwtToken,process.env.User_Key)
+      // const decode=jwt.verify(jwtToken,process.env.User_Key)
      
-       if(!decode.id){
+       if(!req.id){
            throw new Error("Invalid Token")
        }
       
       
-   const couponExist = await Coupon.findOne({couponCode:req.body.couponCode,"users.userId": decode.id }).lean();
+   const couponExist = await Coupon.findOne({couponCode:req.body.couponCode,"users.userId":req.id }).lean();
 
   
 
@@ -117,7 +117,7 @@ const AllCoupon = async (req, res) => {
         
         await Coupon.findByIdAndUpdate({_id:coupons._id},
           {
-            $push: { users: { userId: decode.id} },
+            $push: { users: { userId:req.id} },
             $inc: { limit: -1 },
           }
         );

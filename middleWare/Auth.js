@@ -5,12 +5,12 @@ const jwt = require("jsonwebtoken");
 const VendorAuth = async (req, res, next) => {
     try {
         console.log('request of vendor');
-        console.log(req.cookies.jwtOfVendor);
-        if (!req.cookies || !req.cookies.jwtOfVendor) {
-            return res.status(401).json({ error: "Unauthorized" });
-        }
+        const Header=req.headers.authorization
+        const jwtToken=Header.replace('Bearer','')
+        console.log(Header,'header');
+       
 
-        const jwtToken = req.cookies.jwtOfVendor;
+       
         const decodetoken = jwt.verify(jwtToken, process.env.Vendor_Key);
         const vendorId = decodetoken.id;
         const vendorData = await Vendor.findById({ _id: vendorId });
@@ -31,13 +31,16 @@ const VendorAuth = async (req, res, next) => {
 const AdminAuth = async (req, res, next) => {
     try {
         console.log('request by Admin');
+        const Header=req.headers.authorization
+        const jwtToken=Header.replace('Bearer','')
+       
 
-console.log(req.cookies.jwtOfAdmin);
-        if (!req.cookies || !req.cookies.jwtOfAdmin) {
-            return res.status(401).json({ error: "Unauthorized" });
-        }
+// console.log(req.cookies.jwtOfAdmin);
+//         if (!req.cookies || !req.cookies.jwtOfAdmin) {
+//             return res.status(401).json({ error: "Unauthorized" });
+//         }
 
-        const jwtToken = req.cookies.jwtOfAdmin;
+        // const jwtToken = req.cookies.jwtOfAdmin;
         const decodetoken = jwt.verify(jwtToken, process.env.Admin_Key);
         const vendorId = decodetoken.id;
         const AdminData = await Admin.findById({ _id: vendorId });
@@ -60,17 +63,16 @@ console.log(req.cookies.jwtOfAdmin);
 const UserAuth = async (req, res, next) => {
     try {
         console.log('request by User');
-        console.log(req)
-        console.log(req.cookies,'jwtOfUser');
+        const Header=req.headers.authorization
+        const jwtToken=Header.replace('Bearer','')
+       
+       
 
-        if (!req.cookies || !req.cookies.jwtOfUser) {
-            return res.status(401).json({ error: "Unauthorized" });
-        }
-
-        const jwtToken =req.cookies.jwtOfUser;
+       
         const decodetoken = jwt.verify(jwtToken, process.env.User_Key);
         const UserId = decodetoken.id;
         const UserData = await User.findById({ _id: UserId });
+        console.log(UserData._id,'userID');
 
         if (UserData) {
             console.log('done');

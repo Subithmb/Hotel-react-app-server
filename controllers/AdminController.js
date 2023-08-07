@@ -181,13 +181,13 @@ const UserStatusChange = async (req, res) => {
 // .....marked code
 const Addcategory = async (req, res) => {
   try {
-    if (!req.cookies || !req.cookies.jwtOfVendor) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-    const jwtToken = req.cookies.jwtOfVendor;
-    const decodetoken = jwt.verify(jwtToken, process.env.Vendor_Key);
+    // if (!req.cookies || !req.cookies.jwtOfVendor) {
+    //   return res.status(401).json({ error: "Unauthorized" });
+    // }
+    // const jwtToken = req.cookies.jwtOfVendor;
+    // const decodetoken = jwt.verify(jwtToken, process.env.Vendor_Key);
 
-    const vendorId = decodetoken.id;
+    const vendorId = req.id
 
     const Vendor = await vendor.findOne({ _id: vendorId });
 
