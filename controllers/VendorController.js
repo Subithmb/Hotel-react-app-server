@@ -1,5 +1,4 @@
 const Vendor=require('../models/Vendor')
-// const User=require('../model/User');
 const jwt = require("jsonwebtoken");
 const cloudinary = require('../middleWare/cloudinary')
 const moment = require('moment');
@@ -43,7 +42,7 @@ const VendorLogin=async(req,res)=>{
            
             vendorSignup.Status = true;
             vendorSignup.name = VendorData.name;
-      // const Adminname = adminData[0].name
+  
       let VendorToken = jwt.sign({ id: VendorData._id }, process.env.Vendor_Key, {
         expiresIn: "24h",
       });
@@ -51,12 +50,7 @@ const VendorLogin=async(req,res)=>{
       let obj = {
         VendorToken,
       };
-      // res
-      //   .cookie("jwtOfVendor", obj, {
-      //     httpOnly: false,
-      //     maxAge: 6000 * 1000,
-      //     secure:false
-      //   })
+     
         res.status(200)
         .send({ vendorSignup,message:'success...' })
          }
@@ -78,9 +72,6 @@ const VendorLogin=async(req,res)=>{
 
 const getProfile=async(req,res,next)=>{
   try {
-
-    // const jwtToken = req.cookies.jwtOfVendor;
-    // const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
 
      if(!req.id){
          throw new Error("Invalid Token")
@@ -113,8 +104,7 @@ const getProfile=async(req,res,next)=>{
 
 const editVendorProfile= async(req,res)=>{
   try {
-    // const jwtToken = req.cookies.jwtOfVendor;
-    // const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
+    
    const id=req.id
 
       if(!id){
@@ -144,7 +134,6 @@ const editVendorProfile= async(req,res)=>{
 const editProfile= async(req,res)=>{
   try {
      
-   
 
       if(!req.id){
           throw new Error("Invalid Token")
@@ -158,7 +147,6 @@ const editProfile= async(req,res)=>{
       console.log(req.file,'hfhfh');
       if(req.file&&req.file.path){
         const result = await cloudinary.uploader.upload(req.file.path)
-        // console.log('ready ayiiiiiiii',req.file.path);
         vendorData.image=result.secure_url;
           const url =result.secure_url;
           await vendorData.save()
@@ -177,16 +165,12 @@ const editProfile= async(req,res)=>{
 const ProofData= async(req,res)=>{
   try {
    
-      
-    //  const jwtToken = req.cookies.jwtOfVendor;
-    //  const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
-
+   
       if(!req.id){
           throw new Error("Invalid Token")
       }
       const vendorData = await Vendor.findOne({_id:req.id})
-     // console.log(vendorData,'vennnnnnnnnnnnnnnnnnndor');
-
+   
       if(!vendorData){
           throw new Error("vendor not found")
       }
@@ -212,10 +196,7 @@ const ProofData= async(req,res)=>{
 
 const BookingData=async(req,res)=>{
   try {
-    
-    // const jwtToken = req.cookies.jwtOfVendor;
-    // const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
-    
+  
      if(!req.id){
            throw new Error("Invalid Token")
        }
@@ -225,8 +206,8 @@ const BookingData=async(req,res)=>{
       const Data = await Booking.find({ paymentStatus: true,BookingStatus:"Booked" }).populate('userID').populate('hotelID')
 
       const bookingData=await Data.filter((value)=>{
-   
-   return value.hotelID.vendor.toHexString()===partnerId
+  
+   return value.hotelID.vendor.toHexString()==partnerId
  
  })
  
@@ -248,16 +229,14 @@ const BookingData=async(req,res)=>{
 const Dashbord = async (req, res) => {
   try {
 
-    // const jwtToken = req.cookies.jwtOfVendor;
-    // const decode=jwt.verify(jwtToken,process.env.Vendor_Key)
-    
      if(!req.id){
            throw new Error("Invalid Token")
        }
        const partnerId=req.id
        const Data = await Booking.find({ paymentStatus: true, BookingStatus:"Booked" }).populate('userID').populate('hotelID')
       const bookingData=await Data.filter((value)=>{
-   return value.hotelID.vendor.toHexString()===partnerId
+       
+     return value.hotelID.vendor.toHexString()==partnerId
  
  })
 
@@ -266,6 +245,9 @@ const Dashbord = async (req, res) => {
       let totalRevenue = 0;
       let totalTax = 0;
       let totalVendorRevenue = 0;
+      let totalfee = 0;
+      let totalDiscount = 0;
+      let totalAmount = 0;
 
       bookingData.forEach(booking => {
           const userId = booking.userID.toString(); 
@@ -278,6 +260,9 @@ const Dashbord = async (req, res) => {
           totalRevenue += booking.UpdatedTotal
           totalVendorRevenue+=booking.total
           totalTax+=booking.tax
+          totalfee+=booking.serviceFee
+          totalDiscount+=booking.discount
+          totalAmount+=booking.total
       });
 
      
@@ -318,7 +303,11 @@ const Dashbord = async (req, res) => {
         totalUserCount,
         totalRevenue,
         chartData,
-        chartDatamonthly
+        chartDatamonthly,
+        totalAmount,
+        totalDiscount,
+        totalTax,
+        totalfee
     };
   
        return res.status(200).json({ data ,message:'Booking Datas'});

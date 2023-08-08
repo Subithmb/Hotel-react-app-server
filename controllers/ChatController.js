@@ -1,7 +1,6 @@
 const Admin=require('../models/Admin')
 const User=require('../models/User');
 const jwt = require("jsonwebtoken");
-// const Booking=require('../models/Booking');
 const Chat=require('../models/Chat')
 const Message=require('../models/Message')
 
@@ -9,17 +8,6 @@ const Message=require('../models/Message')
 const createChat=async(req,res)=>{
     try {
 
-
-        // if (!req.cookies || !req.cookies.jwtOfUser) {
-      
-        //     return res.status(401).json({ error: "Unauthorized" });
-        //   }
-      
-          
-        //   const jwtToken = req.cookies.jwtOfUser;
-        //   const decodetoken = jwt.verify(jwtToken, process.env.User_Key);
-      
-          // console.log('jwt',decodetoken);
       
         const userId =req.id
         const adminData=await Admin.findOne()
@@ -95,7 +83,7 @@ const getAllMessage=async (req,res)=>{
 
 
 const findChats=async(req,res)=>{
-    // const adminId=
+   
     try {
        
         const chats=await Chat.find().populate("userId")

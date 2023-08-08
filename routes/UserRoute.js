@@ -26,7 +26,7 @@ userRouter.get('/singlebookings',auth.UserAuth,UserController.userBookingsDetail
 userRouter.post('/reviewWriting',auth.UserAuth,UserController.reviewUpdating)
 userRouter.post('/editphoto',auth.UserAuth,upload.single('image'),UserController.editProfilePhoto)
 userRouter.post('/orders',auth.UserAuth,PaymentController.orderCreate)
-userRouter.post('/walletPay',PaymentController.walletpay)
+userRouter.post('/walletPay',auth.UserAuth,PaymentController.walletpay)
 userRouter.post('/verify',auth.UserAuth,PaymentController.verify)
 userRouter.get('/chatCreate',auth.UserAuth,ChatController.createChat)
 userRouter.post('/CreateMessage',auth.UserAuth,ChatController.createMessage)

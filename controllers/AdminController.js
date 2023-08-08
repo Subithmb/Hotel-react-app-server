@@ -42,7 +42,7 @@ const adminLogin = async (req, res) => {
     if (adminData) {
       adminSignup.Status = true;
       adminSignup.name = adminData.name;
-      // const Adminname = adminData[0].name
+     
       let AdminToken = jwt.sign({ id: adminData._id }, process.env.Admin_Key, {
         expiresIn: "24h",
       });
@@ -50,12 +50,7 @@ const adminLogin = async (req, res) => {
       let obj = {
         AdminToken,
       };
-      // res
-      //   .cookie("jwtOfAdmin", obj, {
-      //     httpOnly:false,
-      //         maxAge: 6000 * 1000,
-      //         secure:false
-      //   })
+      
         res.status(200)
         .send({ adminSignup });
     } else {
@@ -178,14 +173,10 @@ const UserStatusChange = async (req, res) => {
 };
 
 // .............................category............................
-// .....marked code
+
 const Addcategory = async (req, res) => {
   try {
-    // if (!req.cookies || !req.cookies.jwtOfVendor) {
-    //   return res.status(401).json({ error: "Unauthorized" });
-    // }
-    // const jwtToken = req.cookies.jwtOfVendor;
-    // const decodetoken = jwt.verify(jwtToken, process.env.Vendor_Key);
+   
 
     const vendorId = req.id
 
@@ -226,72 +217,11 @@ const getCategory = async (req, res) => {
   }
 };
 
-// ...................................add hotel.....................
-// const AddHotel = async (req, res) => {
-//   try {
-//     if (!req.cookies || !req.cookies.jwtOfVendor) {
-//       return res.status(401).json({ error: "Unauthorized" });
-//     }
-
-//     const jwtToken = req.cookies.jwtOfVendor;
-//     const decodetoken = jwt.verify(jwtToken, process.env.Vendor_Key);
-
-//     const vendorId = decodetoken.id;
-
-//     const vendor = await Vendor.findOne({ _id: vendorId });
-
-//     if (vendor) {
-//       const {
-//         services,
-//         district,
-//         price,
-//         maxGust,
-//         phone,
-//         discription,
-//         brand,
-//         place,
-//         details,
-//         Hotelname,
-//       } = req.body;
-//       const image = req.file.filename;
-
-//       const HotelData = new Hotel({
-//         services,
-//         district,
-//         price,
-//         maxGust,
-//         phone,
-//         discription,
-//         brand,
-//         place,
-//         details,
-//         Hotelname,
-//         image,
-//       });
-//       await HotelData.save();
-
-//       if (!HotelData) {
-//         return res.status(500).json({ message: "unable to add Hotel" });
-//       }
-//       return res.status(201).json({ HotelData });
-//     } else {
-//       return res.status(500).json({ message: "unable to add Hotel" });
-//     }
-//   } catch (error) {
-//     console.log(error.message);
-//   }
-// };
 // ......................getSingleBookingData...............................
 const BookingsDetails=async(req,res)=>{
   try {
  
-    // const jwtToken = req.cookies.jwtOfAdmin;
-   
-    // const decode=jwt.verify(jwtToken,process.env.Admin_Key)
-   
-    //  if(!decode.id){
-    //      throw new Error("Invalid Token")
-    //  }
+    
     console.log(req.id,'req.id');
      const bookingData=await Booking.find().populate('hotelID').populate('userID')
     
@@ -315,10 +245,6 @@ const VendorStatusChange = async (req, res) => {
 
     vendorStatus.status= !vendorStatus.status
     const vendorData = await vendorStatus.save();
-    // const hotelDate = await Hotel.find({vendor:id})
-    // for(data of hotelDate){
-    //   await Hotel.updateOne({adminStatus:!data.adminStatus})
-    // }
 
     const hotelDate = await Hotel.find({ vendor: id });
 for (data of hotelDate) {
@@ -391,6 +317,10 @@ const Dashbord = async (req, res) => {
       const userCounts = {};
       let totalUserCount = 0;
       let totalRevenue = 0;
+      let totalfee = 0;
+      let totalTax = 0;
+      let totalDiscount = 0;
+      let totalAmount = 0;
 
       bookingData.forEach(booking => {
           const userId = booking.userID.toString(); 
@@ -401,6 +331,10 @@ const Dashbord = async (req, res) => {
               userCounts[userId]++;
           }
           totalRevenue += booking.UpdatedTotal
+          totalAmount += booking.total
+          totalDiscount += booking.discount
+          totalTax += booking.tax
+          totalfee += booking.serviceFee
       });
 
      
@@ -442,7 +376,11 @@ const Dashbord = async (req, res) => {
         totalUserCount,
         totalRevenue,
         chartData,
-        chartDatamonthly
+        chartDatamonthly,
+        totalAmount,
+        totalDiscount,
+        totalTax,
+        totalfee
     };
    
        return res.status(200).json({ data ,message:'Booking Datas'});

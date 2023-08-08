@@ -9,8 +9,6 @@ const VendorAuth = async (req, res, next) => {
         const jwtToken=Header.replace('Bearer','')
         console.log(Header,'header');
        
-
-       
         const decodetoken = jwt.verify(jwtToken, process.env.Vendor_Key);
         const vendorId = decodetoken.id;
         const vendorData = await Vendor.findById({ _id: vendorId });
@@ -33,14 +31,7 @@ const AdminAuth = async (req, res, next) => {
         console.log('request by Admin');
         const Header=req.headers.authorization
         const jwtToken=Header.replace('Bearer','')
-       
 
-// console.log(req.cookies.jwtOfAdmin);
-//         if (!req.cookies || !req.cookies.jwtOfAdmin) {
-//             return res.status(401).json({ error: "Unauthorized" });
-//         }
-
-        // const jwtToken = req.cookies.jwtOfAdmin;
         const decodetoken = jwt.verify(jwtToken, process.env.Admin_Key);
         const vendorId = decodetoken.id;
         const AdminData = await Admin.findById({ _id: vendorId });
@@ -65,10 +56,7 @@ const UserAuth = async (req, res, next) => {
         console.log('request by User');
         const Header=req.headers.authorization
         const jwtToken=Header.replace('Bearer','')
-       
-       
 
-       
         const decodetoken = jwt.verify(jwtToken, process.env.User_Key);
         const UserId = decodetoken.id;
         const UserData = await User.findById({ _id: UserId });
@@ -77,6 +65,7 @@ const UserAuth = async (req, res, next) => {
         if (UserData) {
             console.log('done');
             req.id = UserData._id; 
+            console.log(req.id);
             next(); 
         } else {
             return res.status(401).json({ error: "Unauthorized" });

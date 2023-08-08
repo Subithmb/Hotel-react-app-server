@@ -71,10 +71,6 @@ const AllCoupon = async (req, res) => {
   const applyCoupon=async(req,res)=>{
     try {
      
-
-      // const jwtToken = req.cookies.jwtOfUser;
-   
-      // const decode=jwt.verify(jwtToken,process.env.User_Key)
      
        if(!req.id){
            throw new Error("Invalid Token")
@@ -121,9 +117,7 @@ const AllCoupon = async (req, res) => {
             $inc: { limit: -1 },
           }
         );
-  //  const userId = decode.id;
-  //           coupons.users.push({ userId }); 
-  //           const coupon= await coupons.save();
+  
     res.status(200).json({status:true, message: 'Coupon applied',coupons })
   }
 

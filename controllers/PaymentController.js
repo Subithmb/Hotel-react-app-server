@@ -13,58 +13,213 @@ const { format } = require('date-fns');
 
 
 
-    const walletpay = async (req, res) => {
+    // const walletpay = async (req, res) => {
 
-       try {
-         
+//        try {
         
-        // const jwtToken = req.cookies.jwtOfUser;
-        // const decode=jwt.verify(jwtToken,process.env.User_Key)
-   
-         if(!req.id){
-             throw new Error("Invalid Token")
-         }
-         const userID =req.id
+//          if(!req.id){
+//              throw new Error("Invalid Token")
+//          }
+//          const userID =req.id
          
-         if(!userID){
-           throw new Error("user not found")
-          }
+//          if(!userID){
+//            throw new Error("user not found")
+//           }
           
-        const{name,phone,total,totalDays,checkIn,checkOut,hotelID,guest,newTotal,tax,fee,selectedPaymentMethod,discount}=req.body
-      const userData=await User.findById({_id:userID})
+//         const{name,phone,total,totalDays,checkIn,checkOut,hotelID,guest,newTotal,tax,fee,selectedPaymentMethod,discount}=req.body
+//       const userData=await User.findById({_id:userID})
 
-      if(!userData){
-        throw new Error("user not found")
-      }
-       userData.wallet=userData.wallet-newTotal
-            userData.save();
+//       if(!userData){
+//         throw new Error("user not found")
+//       }
+//        userData.wallet=userData.wallet-newTotal
+//             userData.save();
 
-            const newBooking=new Booking({
-              name,bookingId:userID
-              , phone, total, totalDays,checkIn,checkOut,userID,hotelID,guest,
-              serviceFee:fee,
-              paymentStatus:true,
-              discount:discount,
-              paymentType:selectedPaymentMethod,
-              tax,
-              UpdatedTotal:newTotal
-            })
-            const bookedData=await newBooking.save()
+//             const newBooking=new Booking({
+//               name,bookingId:userID
+//               , phone, total, totalDays,checkIn,checkOut,userID,hotelID,guest,
+//               serviceFee:fee,
+//               paymentStatus:true,
+//               discount:discount,
+//               paymentType:selectedPaymentMethod,
+//               tax,
+//               UpdatedTotal:newTotal
+//             })
+//             const bookingData=await newBooking.save()
+
+//             const bookedData=await Booking.findById(bookingData._id ).populate('hotelID').populate('userID')
+
+// // .......................... mail sending sarted..................................
+// const nodemailer = require('nodemailer');
+
+
+// const transporter = nodemailer.createTransport({
+//   service: "gmail",
+//   auth: {
+//     user: process.env.user,
+//     pass: process.env.pass
+//   }
+// });
+
+// const hotelPhotoURL = bookedData.hotelID.Images[0]
+// const hotelName = bookedData.hotelID.Name;
+// const bookingDate = bookedData.createdAt; 
+// const checkinDate = bookedData.checkIn; 
+// const checkoutDate = bookedData.checkOut;
+// const Name = bookedData.name;
+// const checkinDateFormatted = format(new Date(checkinDate), 'MMMM dd, yyyy'); 
+// const checkoutDateFormatted = format(new Date(checkoutDate), 'MMMM dd, yyyy');
+// const bookingDateFormatted = format(new Date(bookingDate), 'MMMM dd, yyyy'); 
+// const emailContent = `
+//   <p style="font-size: 24px; font-weight: bold;">Booking Confirmation</p>
+//   <p>Thank you <strong> ${Name}</strong> for new Booking</p>
+//   <img src=${bookedData.hotelID.Images[0]} alt="Hotel Photo" style="max-width: 100%; height: auto;">
+ 
+//   <p><strong>Hotel Name:</strong><h3> ${hotelName}</h3></p>
+//   <p><strong>Booking Date:</strong> ${bookingDateFormatted}</p>
+//   <p><strong>Check-in Date:</strong> ${checkinDateFormatted}</p>
+//   <p><strong>Check-out Date:</strong> ${checkoutDateFormatted}</p>
+// `;
+
+// const mailOptions = {
+//   from: 'ikeaecom2023@gmail.com',
+//   to: bookedData.userID. email,
+//   subject: 'Booking Confirmation',
+//   html: emailContent,
+// };
+
+//          console.log(mailOptions);   
            
-            res.status(200).json({bookedData})
+//             res.status(200).json({bookedData})
                 
-       } catch (error) {
-        console.log(error);
-       }
-}
+//        } catch (error) {
+//         console.log(error);
+//        }
+// }
+const walletpay = async (req, res) => {
+  try {
+    if (!req.id) {
+      throw new Error("Invalid Token");
+    }
+    const userID = req.id;
+
+    if (!userID) {
+      throw new Error("User not found");
+    }
+
+    const {
+      name,
+      phone,
+      total,
+      totalDays,
+      checkIn,
+      checkOut,
+      hotelID,
+      guest,
+      newTotal,
+      tax,
+      fee,
+      selectedPaymentMethod,
+      discount
+    } = req.body;
+
+    // Assuming User and Booking models are defined and imported correctly
+    const userData = await User.findById(userID);
+
+    if (!userData) {
+      throw new Error("User not found");
+    }
+
+    userData.wallet = userData.wallet - newTotal;
+    await userData.save();
+
+    const newBooking = new Booking({
+      name,
+      bookingId: userID,
+      phone,
+      total,
+      totalDays,
+      checkIn,
+      checkOut,
+      userID,
+      hotelID,
+      guest,
+      serviceFee: fee,
+      paymentStatus: true,
+      discount,
+      paymentType: selectedPaymentMethod,
+      tax,
+      UpdatedTotal: newTotal
+    });
+
+    const bookingData = await newBooking.save();
+
+    const bookedData = await Booking.findById(bookingData._id)
+      .populate('hotelID')
+      .populate('userID');
+
+    // Email sending
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.user,
+        pass: process.env.pass
+      }
+    });
+
+    const hotelPhotoURL = bookedData.hotelID.Images[0]
+    const hotelName = bookedData.hotelID.Name;
+    const hotelId = bookedData.bookingId;
+    const PaymentType = bookedData.paymentType;
+    const bookingDate = bookedData.createdAt; 
+    const checkinDate = bookedData.checkIn; 
+    const checkoutDate = bookedData.checkOut;
+    const Name = bookedData.name;
+    const checkinDateFormatted = format(new Date(checkinDate), 'MMMM dd, yyyy');
+    const checkoutDateFormatted = format(new Date(checkoutDate), 'MMMM dd, yyyy');
+    const bookingDateFormatted = format(new Date(bookingDate), 'MMMM dd, yyyy');
+    const emailContent = `
+
+      <p style="font-size: 24px; font-weight: bold;">Booking Confirmation</p>
+      <p>Thank you <strong> ${Name}</strong> for your new booking</p>
+      <img src=${hotelPhotoURL} alt="Hotel Photo" style="max-width: 100%; height: auto;">
+      <p><strong>Booked By :</strong><h3> ${Name}</h3></p>
+      <p><strong>Booking ID :</strong><h3> ${hotelId}</h3></p>
+      <p><strong>Hotel Name :</strong><h3> ${hotelName}</h3></p>
+      <p><strong>Pay Type :</strong><h3> ${PaymentType}</h3></p>
+      <p><strong>Booking Date :</strong> ${bookingDateFormatted}</p>
+      <p><strong>Check-in Date :</strong> ${checkinDateFormatted}</p>
+      <p><strong>Check-out Date:</strong> ${checkoutDateFormatted}</p>
+    `;
+
+    const mailOptions = {
+      from:'ikeaecom2023@gmail.com',
+      to: bookedData.userID.email,
+      subject: 'Booking Confirmation',
+      html: emailContent,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log('Error sending email: ', error);
+      } else {
+        console.log('Email sent: ', info.response);
+      }
+    });
+
+    res.status(200).json({ bookedData });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 
     const orderCreate = async (req, res) => {
 
        try {
-          //console.log(req.cookies.jwt,'hhhhhhhhhhhhhhhhhhhhh');
-         // console.log(req.body);
-        // const jwtToken = req.cookies.jwtOfUser;
-        // const decode=jwt.verify(jwtToken,process.env.User_Key)
+        
    
          if(!req.id){
              throw new Error("Invalid Token")
@@ -81,7 +236,7 @@ const { format } = require('date-fns');
         let instance = new Razorpay({ key_id:process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_KEY_SECRET })
       
         const options = {
-            amount: newTotal*100,  // amount in the smallest currency unit
+            amount: newTotal*100, 
             currency: "INR",
             receipt: crypto.randomBytes(10).toString("hex"),
           };
@@ -111,16 +266,6 @@ const { format } = require('date-fns');
 const verify=async (req,res)=>{
   try {
 
-    // if (!req.cookies || !req.cookies.jwtOfUser) {
-      
-    //   return res.status(401).json({ error: "Unauthorized" });
-    // }
-
-    
-    // const jwtToken = req.cookies.jwtOfUser;
-    // const decodetoken = jwt.verify(jwtToken, process.env.User_Key);
-
-    // console.log('jwt',decodetoken);
 
       const userId = req.id
 
@@ -134,7 +279,7 @@ const verify=async (req,res)=>{
       .digest("hex");
       if(razorpay_signature === expectedSign){
         const bookingData=await Booking.findOne({bookingId:razorpay_order_id }).populate('hotelID').populate('userID')
-       console.log('dataaaaaa',bookingData);
+       
         if(!bookingData){
           return res.status(404).json({ message: "Booking not found"})
         }
@@ -151,7 +296,6 @@ const verify=async (req,res)=>{
 
 const nodemailer = require('nodemailer');
 
-// Create a Nodemailer transporter with your email service provider's SMTP configuration
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -160,16 +304,12 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// Compose the email content
-// const imagePath = path.join(`${bookingData.hotelID.Images[0]}`);
-// const imageBase64 = fs.readFileSync(imagePath, { encoding: 'base64' });
-// Compose the email content
-// const hotelPhotoURL =  // Replace with the URL of the hotel photo  
-//   <img src="${hotelPhotoURL}" alt="Hotel Photo" style="max-width: 100%; height: auto;">
-// console.log(imageBase64  ,'imageeeeeeeeeeeee');
 
 const hotelPhotoURL = bookingData.hotelID.Images[0]
 const hotelName = bookingData.hotelID.Name;
+const hotelId = bookingData.bookingId;
+const PaymentType = bookingData.paymentType;
+const PaymentId = bookingData.paymentId || '';
 const bookingDate = bookingData.createdAt; 
 const checkinDate = bookingData.checkIn; 
 const checkoutDate = bookingData.checkOut;
@@ -180,9 +320,13 @@ const bookingDateFormatted = format(new Date(bookingDate), 'MMMM dd, yyyy');
 const emailContent = `
   <p style="font-size: 24px; font-weight: bold;">Booking Confirmation</p>
   <p>Thank you <strong> ${name}</strong> for new Booking</p>
-  <img src=${bookingData.hotelID.Images[0]} alt="Hotel Photo" style="max-width: 100%; height: auto;">
+  <img src=${hotelPhotoURL} alt="Hotel Photo" style="max-width: 100%; height: auto;">
  
+  <p><strong>Booked By:</strong><h3> ${name}</h3></p>
+  <p><strong>Booking ID:</strong><h3> ${hotelId}</h3></p>
   <p><strong>Hotel Name:</strong><h3> ${hotelName}</h3></p>
+  <p><strong>Pay Type:</strong><h3> ${PaymentType}</h3></p>
+  <p><strong>Payment ID:</strong><h3> ${PaymentId}</h3></p>
   <p><strong>Booking Date:</strong> ${bookingDateFormatted}</p>
   <p><strong>Check-in Date:</strong> ${checkinDateFormatted}</p>
   <p><strong>Check-out Date:</strong> ${checkoutDateFormatted}</p>
@@ -195,7 +339,7 @@ const mailOptions = {
   html: emailContent,
 };
 
-// Send the email
+//...................... Send the email.........................................
 transporter.sendMail(mailOptions, (error, info) => {
   if (error) {
     console.error('Error sending email:', error);
@@ -205,10 +349,6 @@ transporter.sendMail(mailOptions, (error, info) => {
   }
 });
 // .......................... mail sending ended..................................
-
-
-
-
 
       }else{
 

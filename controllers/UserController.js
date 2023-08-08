@@ -5,35 +5,7 @@ const Booking=require('../models/Booking');
 const Hotel=require('../models/Hotel')
 const cloudinary = require('../middleWare/cloudinary')
 const nodemailer = require("nodemailer");
-// var otp
-// ...............................add user ..................
 
-// const addUser=async(req,res)=>{
-//     try {
-     
-//         const{name,email,password,phone}=req.body
-//         const UserExist=await User.findOne({email:email});
-       
-//         if(!UserExist){
-//         }
-        
-//       const  UserData=new User({
-//         name,email,password,phone
-//         })
-//         await UserData.save();
-        
-//         if(!UserData){
-//            return res.status(500).json({message:"unable to add user"}) 
-//         }
-//        return res.status(200).json({UserData,message:'success'})
-//     } catch (error) {
-//         console.log(error.message);
-        
-//     }}
-
-
-
-// Function to generate a random OTP of length 6
 function generateOTP() {
   const digits = '0123456789';
   let OTP = '';
@@ -43,7 +15,8 @@ function generateOTP() {
   return OTP;
 }
 
-// Function to send OTP via email using Node Mailer
+// ....................Function to send OTP via email using Node Mailer...........................
+
 async function sendOTP(email, otp) {
   try {
     const transporter = nodemailer.createTransport({
@@ -68,7 +41,7 @@ async function sendOTP(email, otp) {
   }
 }
 
-// Function to verify the OTP provided by the user
+//.......................... Function to verify the OTP provided by the user.............................
 async function verifyOTP(userOTP, email) {
   const user = await User.findOne({ email: email });
 
@@ -76,7 +49,7 @@ async function verifyOTP(userOTP, email) {
     return false;
   }
 
-  // Clear the OTP field in the user document to prevent reuse
+
   user.otp = undefined;
   await user.save();
 
@@ -90,18 +63,15 @@ const otpSending = async (req, res) => {
     console.log(UserExist);
 
     if (UserExist) {
-      // Generate OTP
+     
       return res.status(500).json({ message: "User already exists" })
     }
      const otp = generateOTP();
 
-      // Send OTP via email
+      
       await sendOTP(email, otp);
       
-      // const isOTPValid = await verifyOTP(otp, email);
-      // if (!isOTPValid) {
-      //   return res.status(400).json({ message: "Invalid OTP" });
-      // }
+    
 
         const UserData = new User({
           email,
@@ -110,12 +80,10 @@ const otpSending = async (req, res) => {
         await UserData.save();
       
 
-      // Save the OTP to the database (Optional: You can create a new collection to store OTPs)
+     
 
       return res.status(200).json({ message: "otp send successfully" });
-    // } else {
-    //   return res.status(409).json({ message: "User already exists" });
-    // }
+   
   } catch (error) {
     console.log(error.message);
     return res.status(500).json({ message: "Unable to send otp" });
@@ -130,15 +98,7 @@ const addUser = async (req, res) => {
   try {
     console.log(req.body);
     const { name, email, password, phone,otp } = req.body;
-    // const UserExist = await User.findOne({ email: email });
-
-    // if (!UserExist) {
-      // Generate OTP
-      // const otp = generateOTP();
-
-      // Send OTP via email
-      // await sendOTP(email, otp);
-
+   
       const isOTPValid = await verifyOTP(otp, email);
       console.log(isOTPValid,'isOtpvalid');
       if (!isOTPValid) {
@@ -155,12 +115,10 @@ const addUser = async (req, res) => {
         await UserData.save();
       
 
-      // Save the OTP to the database (Optional: You can create a new collection to store OTPs)
+    
 
       return res.status(200).json({UserData, message: "User registered successfully" });
-    // } else {
-    //   return res.status(409).json({ message: "User already exists" });
-    // }
+    
   } catch (error) {
     console.log(error.message);
     return res.status(500).json({ message: "Unable to add user" });
@@ -189,7 +147,7 @@ const addUser = async (req, res) => {
             res.send({ UserSignup });
            }
            if(UserData.status===true){
-            // UserSignup.message = "Your Email blocked by admin";
+           
             return res.status(500).json({ message: "Your Email blocked by admin" });
 
            }else{
@@ -207,13 +165,7 @@ const addUser = async (req, res) => {
           let obj = {
             UserToken,
           };
-          // res
-          // .cookie("jwtOfUser",UserToken, {
-          //     httpOnly:false,
-          //     maxAge: 6000 * 1000,
-          //     secure:false
-          //   })
-          //  .status(200).send({obj, UserSignup,message:'success...!' })
+        
 
            res.cookie("jwtOfUser", UserToken, {
             httpOnly: false,
@@ -236,9 +188,7 @@ const addUser = async (req, res) => {
             
         } catch (error) {
             console.log(error.message);
-            // UserSignup.Status = false;
-            // UserSignup.message = error;
-            // res.send({ UserSignup });
+          
             
         }
     }
@@ -323,8 +273,7 @@ const editProfilePhoto= async(req,res)=>{
         const result = await cloudinary.uploader.upload(req.file.path) 
       
         userData.image=result.secure_url
-        // userData.image=req.file.filename;
-          // const url =req.file.filename;
+      
           const url =result.secure_url;
           await userData.save()
       
