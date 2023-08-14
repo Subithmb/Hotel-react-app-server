@@ -10,13 +10,14 @@ const PaymentController=require('../controllers/PaymentController')
 const ChatController=require('../controllers/ChatController')
 const couponController=require('../controllers/CouponController')
 const auth=require('../middleWare/Auth')
-// const otpController =require('../controllers/otpController')
+const otpController =require('../controllers/otpController')
 
 
 
-// userRouter.post('/sendOTP',otpController.sendOTP)
+userRouter.post('/sendOTP',otpController.sendOTP)
+userRouter.post('/OTPVerify',otpController.verifyOTP)
 
-userRouter.post('/otp',UserController.otpSending)
+// userRouter.post('/otp',UserController.otpSending)
 userRouter.post('/register',UserController.addUser)
 userRouter.post('/login',UserController.UserLogin)
 userRouter.get('/getprofile',auth.UserAuth,UserController.getProfile)
@@ -35,5 +36,6 @@ userRouter.get('/bookingCancel',auth.UserAuth,UserController.CancelBooking)
 userRouter.post('/applyCoupon',auth.UserAuth,couponController.applyCoupon)
 userRouter.get('/userHoteldata',auth.UserAuth,HotelController.hotelDataUser)
 userRouter.get('/singleHoteldata/:id',auth.UserAuth,HotelController.singleHotelData)
+userRouter.get('/searchData',HotelController.getHotelsByPlaceAndName)
 
 module.exports=userRouter

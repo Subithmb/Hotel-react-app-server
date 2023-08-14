@@ -27,7 +27,7 @@ const createChat=async(req,res)=>{
         
     } catch (error) {
         console.log(error);
-        res.status(500).json(error)
+        res.status(500).json({ error: error.message })
     }
 
 }
@@ -52,7 +52,7 @@ const createMessage=async(req,res)=>{
 
     } catch (error) {
         console.log(error);
-        res.status(500).json(error)
+        res.status(500).json({ error: error.message })
     }
 }
 
@@ -66,7 +66,7 @@ const getMessage=async (req,res)=>{
 
     } catch (error) {
         console.log(error);
-        res.status(500).json(error)
+        res.status(500).json({ error: error.message })
     }
 }
 const getAllMessage=async (req,res)=>{
@@ -77,7 +77,7 @@ const getAllMessage=async (req,res)=>{
 
     } catch (error) {
         console.log(error);
-        res.status(500).json(error)
+        res.status(500).json({ error: error.message })
     }
 }
 
@@ -93,15 +93,29 @@ const findChats=async(req,res)=>{
 
     } catch (error) {
 
-        res.status(500).json(error)
+        res.status(500).json({ error: error.message })
     }
 }
 
+const getAdminMessage=async (req,res)=>{
+    try {console.log(req.query.id);
+       
+        const chatId=await Chat.findById({_id:req.query.id})
+        console.log(chatId,'chatid');
+        const messages=await Message.find({chatId:chatId}).populate('chatId').populate('chatId.userId')
+        res.status(200).json({messages})
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: error.message })
+    }
+}
 
 module.exports={
     createChat,
     createMessage,
     getMessage,
     getAllMessage,
-    findChats
+    findChats,
+    getAdminMessage
 }

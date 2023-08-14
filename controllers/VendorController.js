@@ -20,6 +20,7 @@ const addVendor=async(req,res)=>{
        return res.status(201).json({VendorData})
     } catch (error) {
         console.log(error.message);
+        res.status(500).json({ error: error.message })
         
     }}
 
@@ -314,6 +315,7 @@ const Dashbord = async (req, res) => {
     
   } catch (error) {
     console.log(error.message);
+    res.status(500).json({ error: error.message })
   }
 };
 

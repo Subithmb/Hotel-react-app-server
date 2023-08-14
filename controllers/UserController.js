@@ -6,125 +6,28 @@ const Hotel=require('../models/Hotel')
 const cloudinary = require('../middleWare/cloudinary')
 const nodemailer = require("nodemailer");
 
-function generateOTP() {
-  const digits = '0123456789';
-  let OTP = '';
-  for (let i = 0; i < 6; i++) {
-    OTP += digits[Math.floor(Math.random() * 10)];
-  }
-  return OTP;
-}
-
-// ....................Function to send OTP via email using Node Mailer...........................
-
-async function sendOTP(email, otp) {
-  try {
-    const transporter = nodemailer.createTransport({
-      service: "Gmail",
-      auth: {
-        user: process.env.user,
-        pass: process.env.pass,
-      },
-    });
-
-    const mailOptions = {
-      from: "ikeaecom2023@gmail.com",
-      to: email,
-      subject: "OTP Verification",
-      html:`<p>Your Hotel OTP is  <span  style="font-size:24px;font-weight:bold;">  ${otp} </span> .It will expire in 3 minutes, Do not share with others</p>`
-    };
-
-    const info = await transporter.sendMail(mailOptions);
-    console.log("Email sent:", info.response);
-  } catch (error) {
-    console.log("Error sending email:", error.message);
-  }
-}
-
-//.......................... Function to verify the OTP provided by the user.............................
-async function verifyOTP(userOTP, email) {
-  const user = await User.findOne({ email: email });
-
-  if (!user || user.otp !== userOTP) {
-    return false;
-  }
-
-
-  user.otp = undefined;
-  await user.save();
-
-  return true;
-}
-
-const otpSending = async (req, res) => {
-  try {
-    const {email} = req.body;
-    const UserExist = await User.findOne({ email: email });
-    console.log(UserExist);
-
-    if (UserExist) {
-     
-      return res.status(500).json({ message: "User already exists" })
-    }
-     const otp = generateOTP();
-
-      
-      await sendOTP(email, otp);
-      
-    
-
-        const UserData = new User({
-          email,
-          otp,
-        });
-        await UserData.save();
-      
-
-     
-
-      return res.status(200).json({ message: "otp send successfully" });
-   
-  } catch (error) {
-    console.log(error.message);
-    return res.status(500).json({ message: "Unable to send otp" });
-  }
-};
-
-
 
 // ............................
 
-const addUser = async (req, res) => {
+
+const addUser=async(req,res)=>{
   try {
-    console.log(req.body);
-    const { name, email, password, phone,otp } = req.body;
-   
-      const isOTPValid = await verifyOTP(otp, email);
-      console.log(isOTPValid,'isOtpvalid');
-      if (!isOTPValid) {
-        return res.status(400).json({ message: "Invalid OTP" });
-      }
-
-        const UserData =await User.findOne({email:email });
-
-         UserData.name=name
-         UserData.password=password
-         UserData.phone=phone
-         
-       
-        await UserData.save();
+     
+      const{name,email,password,phone}=req.body
+    const  userData=new User({
+      name,email,password,phone
+      })
+      await userData.save();
       
-
-    
-
-      return res.status(200).json({UserData, message: "User registered successfully" });
-    
+      if(!userData){
+         return res.status(500).json({message:"unable to add user"}) 
+      }
+     return res.status(201).json({userData})
   } catch (error) {
-    console.log(error.message);
-    return res.status(500).json({ message: "Unable to add user" });
-  }
-};
-
+      console.log(error.message);
+      res.status(500).json({ error: error.message })
+      
+  }}
 
     // .......................................user login  .............................................
     const UserLogin=async(req,res)=>{
@@ -188,7 +91,7 @@ const addUser = async (req, res) => {
             
         } catch (error) {
             console.log(error.message);
-          
+            res.status(500).json({ error: error.message })
             
         }
     }
@@ -214,7 +117,7 @@ const getProfile=async(req,res,next)=>{
       }
    
   } catch (error) {
-    return res.status(403).json({ error: "Token verification failed" });
+    res.status(500).json({ error: error.message })
   }
 }
 
@@ -425,7 +328,6 @@ const CancelBooking=async(req,res)=>{
         userBookings,
         userBookingsDetail,
         reviewUpdating,
-        otpSending,
         CancelBooking
 
     }

@@ -41,7 +41,7 @@ const AdminAuth = async (req, res, next) => {
             req.id = AdminData._id; 
             next(); 
         } else {
-            return res.status(401).json({ error: "Unauthorized" });
+            return res.status(401).json({ error: "Unauthorized " });
         }
     } catch (error) {
         console.log(error);
@@ -56,11 +56,15 @@ const UserAuth = async (req, res, next) => {
         console.log('request by User');
         const Header=req.headers.authorization
         const jwtToken=Header.replace('Bearer','')
+        if(!jwtToken){
+            return res.status(401).json({ error: "Unauthorized" });
+        }
 
         const decodetoken = jwt.verify(jwtToken, process.env.User_Key);
         const UserId = decodetoken.id;
-        const UserData = await User.findById({ _id: UserId });
-        console.log(UserData._id,'userID');
+        // const UserData = await User.findOne({ _id: UserId,status:false });
+        const UserData = await User.findById({ _id: UserId});
+        // console.log(UserData._id,'userID');
 
         if (UserData) {
             console.log('done');

@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const Booking=require('../models/Booking');
 const Hotel=require('../models/Hotel')
 const moment = require('moment');
+const nodemailer = require('nodemailer');
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< add admin account >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 const addAdmin = async (req, res) => {
@@ -23,6 +24,7 @@ const addAdmin = async (req, res) => {
     return res.status(201).json({ adminData });
   } catch (error) {
     console.log(error.message);
+    res.status(500).json({ error: error.message })
   }
 };
 
@@ -63,6 +65,7 @@ const adminLogin = async (req, res) => {
     adminSignup.Status = false;
     adminSignup.message = error;
     res.send({ adminSignup });
+    
   }
 };
 
@@ -79,6 +82,7 @@ const vendorRequest = async (req, res) => {
     }
   } catch (error) {
     console.log(error.message);
+    res.status(500).json({ error: error.message })
   }
 };
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<  Vendorview >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -96,6 +100,7 @@ const vendorView = async (req, res) => {
     }
   } catch (error) {
     console.log(error.message);
+    res.status(500).json({ error: error.message })
   }
 };
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<  Vendor approval >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -118,6 +123,7 @@ const vendorApprove = async (req, res) => {
     }
   } catch (error) {
     console.log(error.message);
+    res.status(500).json({ error: error.message })
   }
 };
 
@@ -134,6 +140,7 @@ const vendorManage = async (req, res) => {
     }
   } catch (error) {
     console.log(error.message);
+    res.status(500).json({ error: error.message })
   }
 };
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<  User Listing >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -149,6 +156,7 @@ const UserManage = async (req, res) => {
     }
   } catch (error) {
     console.log(error.message);
+    res.status(500).json({ error: error.message })
   }
 };
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<  User Block >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -169,6 +177,7 @@ const UserStatusChange = async (req, res) => {
     }
   } catch (error) {
     console.log(error.message);
+    res.status(500).json({ error: error.message })
   }
 };
 
@@ -200,6 +209,7 @@ const Addcategory = async (req, res) => {
     }
   } catch (error) {
     console.log(error.message);
+    res.status(500).json({ error: error.message })
   }
 };
 // ...........................get category...........................
@@ -214,6 +224,7 @@ const getCategory = async (req, res) => {
     return res.status(201).json({ categoryData });
   } catch (error) {
     console.log(error.message);
+    res.status(500).json({ error: error.message })
   }
 };
 
@@ -246,8 +257,8 @@ const VendorStatusChange = async (req, res) => {
     vendorStatus.status= !vendorStatus.status
     const vendorData = await vendorStatus.save();
 
-    const hotelDate = await Hotel.find({ vendor: id });
-for (data of hotelDate) {
+    const hotelData = await Hotel.find({ vendor: id });
+for (data of hotelData) {
   await Hotel.updateOne({ _id: data._id }, { adminStatus:!data.adminStatus });
 }
 
@@ -259,18 +270,17 @@ for (data of hotelDate) {
     }
   } catch (error) {
     console.log(error.message);
+    res.status(500).json({ error: error.message })
   }
 };
 
 
 const CancelBooking=async(req,res)=>{
   try {
-    
+    const reason=req.body.reason
      const id=req.query.id
-   
-     
      const bookingData=await Booking.findById({_id:id,BookingStatus:'Booked'}).populate('hotelID')
-    
+  
     if(!bookingData){
 
       res.status(404).json({message:'data not found'})
@@ -287,6 +297,55 @@ const CancelBooking=async(req,res)=>{
       UserData.save()
       bookingData.BookingStatus='cancelled'
       bookingData.save()
+   
+// .......................... mail sending sarted..................................
+
+
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.user,
+    pass: process.env.pass,
+  }
+});
+
+const hotelPhotoURL = bookingData.hotelID.Images[0]
+const hotelName = bookingData.hotelID.Name;
+const hotelId = bookingData.bookingId;
+const name = bookingData.name;
+
+const emailContent = `
+  <p style="font-size: 24px; font-weight: bold;">Booking Cancelling</p>
+  <p>we are really sorry <strong> ${name}</strong> for new Booking is cancelled</p>
+ 
+  <img src=${hotelPhotoURL} alt="Hotel Photo" style="max-width: 100%; height: auto;">
+ 
+  <p><strong>Booked By:</strong><h3> ${name}</h3></p>
+  <p><strong>Booking ID:</strong><h3> ${hotelId}</h3></p>
+  <p><strong>Hotel Name:</strong><h3> ${hotelName}</h3></p>
+
+  <p><strong>reason :</strong> ${reason}</p>
+  <p>your payment is return to your wallet thank you ... </p>
+`;
+
+const mailOptions = {
+  from: 'ikeaecom2023@gmail.com',
+  to: UserData.email,
+  subject: 'Booking Cancelling',
+  html: emailContent,
+};
+
+//...................... Send the email.........................................
+transporter.sendMail(mailOptions, (error, info) => {
+  if (error) {
+    console.error('Error sending email:', error);
+  } else {
+    console.log('Email sent successfully:');
+    return  res.status(200).send({bookingData,message:"success"});
+  }
+});
+// .......................... mail sending ended..................................
       
       res.status(200).send({bookingData,message:"success"})
     }
@@ -387,6 +446,7 @@ const Dashbord = async (req, res) => {
     
   } catch (error) {
     console.log(error.message);
+    res.status(500).json({ error: error.message })
   }
 };
 

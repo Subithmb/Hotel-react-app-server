@@ -17,7 +17,9 @@ vendorRouter.post('/vendorprofile',Auth.VendorAuth,upload.single('image'),Vendor
 // need to check after middleware update
 vendorRouter.post('/vendorproof',Auth.VendorAuth,upload.single('proof'),VendorController.ProofData)
 vendorRouter.post('/addHotel',Auth.VendorAuth, upload.fields([{ name: 'license', maxCount: 1 },{ name:'images', maxCount: 10 }]),HotelController.AddHotel)
+vendorRouter.post('/EditHotel',Auth.VendorAuth,HotelController.EditHotel)
 vendorRouter.get('/hotelDatas',Auth.VendorAuth,HotelController.hotelData)
+vendorRouter.get('/singlehotelDatas',Auth.VendorAuth,HotelController.singlehotelData)
 vendorRouter.get('/bookingDatas',Auth.VendorAuth,VendorController.BookingData)
 vendorRouter.get('/dashbord',Auth.VendorAuth,VendorController.Dashbord)
 

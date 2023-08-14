@@ -47,7 +47,11 @@ mongoose.connect(process.env.db_Connection).then(() => {
             console.log(data.newtext);
 
             io.emit("receive_message", data.newtext);
+            
         });
+        socket.on('discount',()=>{
+            console.log('disconnected');
+        })
     });
 
     server.listen(process.env.PORT || 5000, () => {

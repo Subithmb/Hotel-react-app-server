@@ -127,9 +127,76 @@ const AllCoupon = async (req, res) => {
     }
   }
 
+  // ................................block coupon .....................................
+
+  const couponBlock=async(req,res)=>{
+    try {
+     
+      const CouponData = await Coupon.findById({_id:req.query.id})
+    
+      if(!CouponData){
+        return res.status(400).json({ message: 'coupon not found' })
+      }
+      CouponData.status= !CouponData.status
+      CouponData.save()
+      
+      return res.status(400).json({ CouponData,message: "Status changed" });
+    } catch (error) {
+      console.log(error);
+      
+    }
+  }
+
+  // .............................coupon Edit  ......................................
+
+
+  
+const EditCoupon = async (req, res) => {
+  try {
+     console.log('sdfsdsdfsdfsdf');
+    const {
+      name,
+      startDate,
+      expiryDate,
+      couponCode,
+      discountPercentage,
+      minBookingAmount,
+      limit,
+      id
+    } = req.body.coupon;
+
+
+    const existingCoupon = await Coupon.findById({_id:id});
+console.log(existingCoupon);
+    if (!existingCoupon) {
+      return res.status(404).json({ message: "Coupon not exist" });
+    }
+    
+   
+      existingCoupon.CouponName = name
+    existingCoupon.limit = limit
+    existingCoupon.couponCode = couponCode
+    existingCoupon.validFrom = startDate
+    existingCoupon.validUpto = expiryDate
+    existingCoupon.percentage = discountPercentage
+   existingCoupon.minimumAmount = minBookingAmount
+     
+    
+     const CouponData= await existingCoupon.save();
+ console.log(CouponData,'couponData  ');
+    return res.status(200).json({ CouponData, message: "Coupon updated successfully" });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
 
 module.exports={
     AddCoupon,
     AllCoupon,
-    applyCoupon
+    applyCoupon,
+    couponBlock,
+    EditCoupon
 }

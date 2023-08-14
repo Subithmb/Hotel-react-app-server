@@ -260,6 +260,7 @@ const walletpay = async (req, res) => {
             })
        } catch (error) {
         console.log(error);
+        res.status(500).json({ error: error.message })
        }
 }
 
@@ -294,7 +295,7 @@ const verify=async (req,res)=>{
 // .......................... mail sending sarted..................................
 
 
-const nodemailer = require('nodemailer');
+
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
