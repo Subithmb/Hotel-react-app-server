@@ -3,7 +3,8 @@ const jwt = require("jsonwebtoken");
 const cloudinary = require('../middleWare/cloudinary')
 const moment = require('moment');
 const Booking=require('../models/Booking');
-const Hotel=require('../models/Hotel')
+const Hotel=require('../models/Hotel');
+const { hotelData } = require('./HotelController');
 
 const addVendor=async(req,res)=>{
     try {
