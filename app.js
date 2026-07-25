@@ -15,6 +15,7 @@ const nodemailer = require('nodemailer');
 const cloudinary = require('cloudinary').v2;
 const { Server } = require('socket.io');
 const http = require("http");
+const https = require("https");
 const corsOrigin = [process.env.Cors_URL,'http://localhost:3000']
 
 app.use(express.json());
@@ -24,9 +25,33 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.options('*', cors());
 
+app.get("/health", (req, res) => {
+    res.status(200).send("OK");
+});
+
 app.use("/", userRouter);
 app.use("/admin", adminRouter);
 app.use("/vendor", vendorRouter);
+
+function startKeepAlive() {
+    const url = process.env.PUBLIC_URL;
+    if (!url) {
+        console.log("PUBLIC_URL environment variable is not set. Keep-alive ping disabled.");
+        return;
+    }
+
+    console.log(`Keep-alive ping initialized targeting: ${url}`);
+    
+    // Set interval to ping every 10 minutes (600000 ms)
+    setInterval(() => {
+        const client = url.startsWith("https") ? https : http;
+        client.get(`${url}/health`, (res) => {
+            console.log(`Keep-alive ping successful. Status: ${res.statusCode}`);
+        }).on("error", (err) => {
+            console.error(`Keep-alive ping error: ${err.message}`);
+        });
+    }, 10 * 60 * 1000);
+}
 
 mongoose.connect(process.env.db_Connection).then(() => {
     const server = http.createServer(app);
@@ -56,6 +81,7 @@ mongoose.connect(process.env.db_Connection).then(() => {
 
     server.listen(process.env.PORT || 5000, () => {
         console.log("Express server with Socket.IO running on port 5000");
+        startKeepAlive();
     });
 });
 
